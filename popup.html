@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 350px;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .status.info {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+    .status.success {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+    }
+    .status.error {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+    .preview {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      display: none;
+    }
+    .preview-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    .preview-content {
+      color: #666;
+      font-size: 14px;
+      max-height: 100px;
+      overflow: hidden;
+    }
+    .preview-images {
+      margin-top: 10px;
+    }
+    .preview-image {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      margin-right: 5px;
+      border-radius: 4px;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .clip-btn {
+      background-color: #ff2442;
+      color: white;
+    }
+    .clip-btn:hover {
+      background-color: #e01e3c;
+    }
+    .clip-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .settings-btn {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    .settings-btn:hover {
+      background-color: #e0e0e0;
+    }
+    .settings-panel {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .save-btn {
+      background-color: #4caf50;
+      color: white;
+      width: 100%;
+    }
+    .save-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">Red To Notion</div>
+  </div>
+  
+  <div id="status" class="status info">
+    Please use this tool on Xiaohongshu post pages
+  </div>
+  
+  <div id="preview" class="preview">
+    <div class="preview-title" id="previewTitle"></div>
+    <div class="preview-content" id="previewContent"></div>
+    <div class="preview-images" id="previewImages"></div>
+  </div>
+  
+  <div class="buttons">
+    <button id="clipBtn" class="clip-btn" disabled>Clip to Notion</button>
+    <button id="settingsBtn" class="settings-btn">Settings</button>
+  </div>
+  
+  <div id="settingsPanel" class="settings-panel">
+    <div class="form-group">
+      <label for="notionToken">Notion Integration Token:</label>
+      <input type="password" id="notionToken" placeholder="Enter your Notion Token">
+    </div>
+    <div class="form-group">
+      <label for="pageId">Page ID:</label>
+      <input type="text" id="pageId" placeholder="Enter target Notion page ID">
+    </div>
+    <button id="saveBtn" class="save-btn">Save Settings</button>
+  </div>
+  
+  <script src="dist/popup.js"></script>
+</body>
+</html>

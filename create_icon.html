@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Icon</title>
+</head>
+<body>
+    <canvas id="canvas16" width="16" height="16"></canvas>
+    <canvas id="canvas32" width="32" height="32"></canvas>
+    <canvas id="canvas48" width="48" height="48"></canvas>
+    <canvas id="canvas128" width="128" height="128"></canvas>
+    
+    <script>
+        function createIcon(size) {
+            const canvas = document.getElementById(`canvas${size}`);
+            const ctx = canvas.getContext('2d');
+            
+            // 背景 - 小红书红色
+            ctx.fillStyle = '#ff2442';
+            ctx.fillRect(0, 0, size, size);
+            
+            // 添加圆角效果
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, size * 0.2);
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+            
+            // 白色文字 "RN"
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${size * 0.4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('RN', size / 2, size / 2);
+        }
+        
+        // Create icons
+        [16, 32, 48, 128].forEach(size => createIcon(size));
+        
+        // Download function
+        function downloadIcon(size) {
+            const canvas = document.getElementById(`canvas${size}`);
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Add download buttons
+        [16, 32, 48, 128].forEach(size => {
+            const btn = document.createElement('button');
+            btn.textContent = `Download ${size}x${size}`;
+            btn.onclick = () => downloadIcon(size);
+            document.body.appendChild(btn);
+            document.body.appendChild(document.createElement('br'));
+        });
+    </script>
+</body>
+</html>

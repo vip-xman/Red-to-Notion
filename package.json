@@ -1,0 +1,16 @@
+{
+  "name": "xiaohongshu-clipper",
+  "version": "1.0.0",
+  "description": "Chrome extension to clip Xiaohongshu posts to Notion",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch"
+  },
+  "devDependencies": {
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15"
+  }
+}
