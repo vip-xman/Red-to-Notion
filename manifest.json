@@ -12,11 +12,13 @@
   "permissions": [
     "activeTab",
     "storage",
-    "scripting"
+    "scripting",
+    "identity"
   ],
   "host_permissions": [
     "https://www.xiaohongshu.com/*",
-    "https://api.notion.com/*"
+    "https://api.notion.com/*",
+    "https://*.vercel.app/*"
   ],
   "action": {
     "default_popup": "popup.html",

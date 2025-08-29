@@ -5,6 +5,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true;
   }
+  
+  if (request.action === 'notionOAuth') {
+    handleNotionOAuth()
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true;
+  }
+  
+  if (request.action === 'getNotionPages') {
+    getNotionPages(request.accessToken, request.query)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true;
+  }
 });
 
 async function handleClipToNotion(data, settings) {
@@ -162,4 +176,123 @@ async function handleClipToNotion(data, settings) {
     console.error('Clip to Notion error:', error);
     return { success: false, error: error.message };
   }
+}
+
+// OAuth授权流程
+async function handleNotionOAuth() {
+  try {
+    const CLIENT_ID = '25ed872b-594c-804a-baa6-0037917bc7e3';
+    const REDIRECT_URI = 'https://red-to-notion.vercel.app/api/auth/callback';
+    
+    // 生成随机state用于CSRF保护
+    const state = generateRandomState();
+    
+    // 构建授权URL
+    const authUrl = new URL('https://api.notion.com/v1/oauth/authorize');
+    authUrl.searchParams.set('client_id', CLIENT_ID);
+    authUrl.searchParams.set('response_type', 'code');
+    authUrl.searchParams.set('owner', 'user');
+    authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
+    authUrl.searchParams.set('state', state);
+    
+    // 启动OAuth流程
+    const responseUrl = await chrome.identity.launchWebAuthFlow({
+      url: authUrl.toString(),
+      interactive: true
+    });
+    
+    // 解析返回的URL
+    const urlParams = new URL(responseUrl);
+    const code = urlParams.searchParams.get('code');
+    const returnedState = urlParams.searchParams.get('state');
+    
+    if (!code) {
+      throw new Error('授权失败：未获取到授权码');
+    }
+    
+    if (returnedState !== state) {
+      throw new Error('授权失败：状态验证失败');
+    }
+    
+    // 通过我们的API服务器交换token
+    const tokenResponse = await fetch('https://red-to-notion.vercel.app/api/auth/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        code: code,
+        redirect_uri: REDIRECT_URI
+      })
+    });
+    
+    const tokenData = await tokenResponse.json();
+    
+    if (!tokenResponse.ok) {
+      throw new Error(tokenData.error || 'Token交换失败');
+    }
+    
+    // 保存OAuth信息到storage
+    await chrome.storage.sync.set({
+      oauthToken: tokenData.access_token,
+      workspaceName: tokenData.workspace_name,
+      workspaceIcon: tokenData.workspace_icon,
+      workspaceId: tokenData.workspace_id,
+      botId: tokenData.bot_id,
+      authMethod: 'oauth'
+    });
+    
+    return {
+      success: true,
+      workspace: {
+        name: tokenData.workspace_name,
+        icon: tokenData.workspace_icon,
+        id: tokenData.workspace_id
+      }
+    };
+    
+  } catch (error) {
+    console.error('OAuth error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// 获取用户的Notion页面列表
+async function getNotionPages(accessToken, query = '') {
+  try {
+    const response = await fetch('https://red-to-notion.vercel.app/api/notion/pages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        access_token: accessToken,
+        query: query,
+        page_size: 50
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || '获取页面列表失败');
+    }
+    
+    return {
+      success: true,
+      pages: data.pages,
+      hasMore: data.has_more
+    };
+    
+  } catch (error) {
+    console.error('Get pages error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// 生成随机状态字符串
+function generateRandomState() {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }

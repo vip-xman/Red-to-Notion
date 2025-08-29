@@ -1,15 +1,36 @@
 # Red To Notion - 小红书剪藏Chrome扩展
 
-一键将小红书帖子内容剪藏到Notion页面的Chrome浏览器扩展。
+## 项目概述
 
-## ✨ 功能特性
+  这是一个名为"Red To Notion"的Chrome浏览器扩展，用于将小红书帖子内容一键剪藏到Notion页面。
 
-- 🔍 **智能识别** - 自动检测小红书帖子页面
-- 📝 **内容提取** - 精准提取帖子标题、正文内容
-- 🖼️ **图片处理** - 智能识别和排序多图内容，支持轮播图
-- 🏷️ **标签识别** - 自动提取话题标签
-- 📄 **页面集成** - 直接添加到指定Notion页面
-- 🎨 **用户友好** - 内容预览界面，所见即所得
+## ✨ 核心功能
+- 智能内容提取：自动识别并提取小红书帖子的标题、正文、图片和标签
+- 图片处理：支持轮播图智能排序和多图内容识别
+- Notion集成：直接将内容添加到指定的Notion页面
+- 用户友好界面：提供内容预览和设置配置
+
+## 技术架构
+主要文件结构：
+- manifest.json - Chrome扩展配置（Manifest V3）
+- content.js - 内容脚本，负责页面内容提取
+- background.js - 后台服务，处理Notion API调用
+- popup.js/html - 扩展弹窗界面和交互逻辑
+- webpack.config.js - 构建配置
+
+技术栈：
+- Chrome Extension Manifest V3
+- Webpack 5 构建工具
+- Notion API (@notionhq/client)
+- 原生JavaScript实现
+
+## 工作流程
+1. 内容提取 (content.js:18-48)：检测小红书页面，提取标题、内容、图片和标签
+2. 图片处理 (content.js:118-261)：智能识别轮播图顺序，过滤无关图片
+3. 用户交互 (popup.js:14-116)：显示内容预览，处理用户操作
+4. 数据传输 (background.js:10-164)：将提取的内容格式化并发送到Notion API
+
+
 
 ## 🚀 安装步骤
 
@@ -91,42 +112,6 @@ npm run dev
 # 生产构建
 npm run build
 ```
-
-### 技术栈
-
-- **Chrome Extension Manifest V3** - 最新扩展规范
-- **Webpack 5** - 模块打包工具
-- **Notion API** - 官方API集成
-- **原生JavaScript** - 轻量级实现
-
-## 📁 项目结构
-
-```
-xiaohongshu-clipper/
-├── manifest.json          # Chrome扩展配置文件
-├── popup.html            # 扩展弹窗UI界面
-├── popup.js             # 弹窗逻辑和用户交互
-├── content.js           # 内容脚本，负责页面内容提取
-├── background.js        # 后台服务工作者，处理Notion API
-├── webpack.config.js    # Webpack打包配置
-├── package.json         # 项目依赖和脚本配置
-├── images/             # 扩展图标资源
-│   ├── icon-16.png
-│   ├── icon-32.png
-│   ├── icon-48.png
-│   └── icon-128.png
-└── dist/              # 构建输出目录
-    ├── popup.js
-    ├── content.js
-    └── background.js
-```
-
-### 核心文件说明
-
-- **content.js**: 在小红书页面注入，提取帖子内容、图片和标签
-- **popup.js**: 扩展弹窗界面逻辑，处理用户交互和设置管理  
-- **background.js**: 后台脚本，负责与Notion API通信
-- **manifest.json**: 扩展权限、脚本注入和资源配置
 
 ## 🤝 贡献
 
