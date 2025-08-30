@@ -1,15 +1,13 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/auth/token.js": {
+      "runtime": "@vercel/node@18.x"
+    },
+    "api/auth/callback.js": {
+      "runtime": "@vercel/node@18.x"
+    },
+    "api/notion/pages.js": {
+      "runtime": "@vercel/node@18.x"
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    }
-  ]
+  }
 }

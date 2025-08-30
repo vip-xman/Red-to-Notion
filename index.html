@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Red To Notion</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>Red To Notion API Server</h1>
+    <p>This is the API server for the Red To Notion Chrome extension.</p>
+    
+    <h2>API Endpoints:</h2>
+    <ul>
+        <li><strong>POST /api/auth/token</strong> - Exchange OAuth code for access token</li>
+        <li><strong>GET /api/auth/callback</strong> - OAuth callback handler</li>
+        <li><strong>POST /api/notion/pages</strong> - Get user's Notion pages</li>
+    </ul>
+    
+    <div id="test-results">
+        <h2>Testing API Endpoints:</h2>
+    </div>
+
+    <script>
+        async function testEndpoints() {
+            const results = document.getElementById('test-results');
+            
+            // Test callback endpoint
+            try {
+                const response = await fetch('/api/auth/callback');
+                const isOk = response.ok;
+                results.innerHTML += `
+                    <div class="status ${isOk ? 'success' : 'error'}">
+                        GET /api/auth/callback: ${response.status} ${response.statusText}
+                    </div>
+                `;
+            } catch (error) {
+                results.innerHTML += `
+                    <div class="status error">
+                        GET /api/auth/callback: Error - ${error.message}
+                    </div>
+                `;
+            }
+            
+            // Test token endpoint
+            try {
+                const response = await fetch('/api/auth/token');
+                const isOk = response.status === 405; // Should be Method Not Allowed for GET
+                results.innerHTML += `
+                    <div class="status ${isOk ? 'success' : 'error'}">
+                        GET /api/auth/token: ${response.status} ${response.statusText} ${isOk ? '(Expected)' : '(Unexpected)'}
+                    </div>
+                `;
+            } catch (error) {
+                results.innerHTML += `
+                    <div class="status error">
+                        GET /api/auth/token: Error - ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Run tests when page loads
+        testEndpoints();
+    </script>
+</body>
+</html>
