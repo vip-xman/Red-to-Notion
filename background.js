@@ -182,7 +182,7 @@ async function handleClipToNotion(data, settings) {
 async function handleNotionOAuth() {
   try {
     const CLIENT_ID = '25ed872b-594c-804a-baa6-0037917bc7e3';
-    const REDIRECT_URI = 'https://red-to-notion-gnnjzcx5y-abuers-projects.vercel.app/api/auth/callback';
+    const REDIRECT_URI = 'https://red-to-notion.vercel.app/api/auth/callback';
     
     // 生成随机state用于CSRF保护
     const state = generateRandomState();
@@ -215,7 +215,7 @@ async function handleNotionOAuth() {
     }
     
     // 通过我们的API服务器交换token
-    const tokenResponse = await fetch('https://red-to-notion-gnnjzcx5y-abuers-projects.vercel.app/api/auth/token', {
+    const tokenResponse = await fetch('https://red-to-notion.vercel.app/api/auth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -260,7 +260,7 @@ async function handleNotionOAuth() {
 // 获取用户的Notion页面列表
 async function getNotionPages(accessToken, query = '') {
   try {
-    const response = await fetch('https://red-to-notion-gnnjzcx5y-abuers-projects.vercel.app/api/notion/pages', {
+    const response = await fetch('https://red-to-notion.vercel.app/api/notion/pages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
