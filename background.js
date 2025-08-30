@@ -195,11 +195,16 @@ async function handleNotionOAuth() {
     authUrl.searchParams.set('redirect_uri', REDIRECT_URI);
     authUrl.searchParams.set('state', state);
     
+    console.log('🔗 OAuth授权URL:', authUrl.toString());
+    console.log('🎯 重定向URI:', REDIRECT_URI);
+    
     // 启动OAuth流程
     const responseUrl = await chrome.identity.launchWebAuthFlow({
       url: authUrl.toString(),
       interactive: true
     });
+    
+    console.log('📥 OAuth返回URL:', responseUrl);
     
     // 解析返回的URL
     const urlParams = new URL(responseUrl);
@@ -233,14 +238,21 @@ async function handleNotionOAuth() {
     }
     
     // 保存OAuth信息到storage
-    await chrome.storage.sync.set({
+    const dataToSave = {
       oauthToken: tokenData.access_token,
       workspaceName: tokenData.workspace_name,
       workspaceIcon: tokenData.workspace_icon,
       workspaceId: tokenData.workspace_id,
       botId: tokenData.bot_id,
       authMethod: 'oauth'
-    });
+    };
+    
+    console.log('💾 保存OAuth数据到storage:', dataToSave);
+    await chrome.storage.sync.set(dataToSave);
+    
+    // 验证数据是否保存成功
+    const savedData = await chrome.storage.sync.get(['oauthToken', 'workspaceName', 'authMethod']);
+    console.log('✅ 保存后验证数据:', savedData);
     
     return {
       success: true,

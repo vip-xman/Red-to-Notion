@@ -83,11 +83,16 @@ document.addEventListener('DOMContentLoaded', function() {
   async function checkAuthStatus() {
     const result = await chrome.storage.sync.get(['oauthToken', 'workspaceName', 'workspaceIcon', 'authMethod']);
     
+    // 添加调试日志
+    console.log('🔍 检查认证状态:', result);
+    
     if (result.oauthToken && result.authMethod === 'oauth') {
+      console.log('✅ 用户已登录');
       state.isLoggedIn = true;
       state.oauthToken = result.oauthToken;
       showLoggedInState(result);
     } else {
+      console.log('❌ 用户未登录，状态:', { hasToken: !!result.oauthToken, authMethod: result.authMethod });
       state.isLoggedIn = false;
       showLoggedOutState();
     }
@@ -118,21 +123,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // OAuth 登录处理
   async function handleOAuthLogin() {
+    console.log('🚀 开始OAuth登录');
     elements.oauthBtn.disabled = true;
     elements.oauthBtn.textContent = '🔄 正在授权...';
     updateStatus('正在跳转到 Notion 授权页面...', 'info');
 
     try {
+      console.log('📤 发送OAuth请求到background');
       const response = await chrome.runtime.sendMessage({ action: 'notionOAuth' });
+      console.log('📥 收到OAuth响应:', response);
       
       if (response.success) {
+        console.log('✅ OAuth成功，检查认证状态');
         updateStatus('授权成功！正在加载...', 'success');
         await checkAuthStatus();
         await loadManagedPages();
+        console.log('🔄 状态更新完成');
       } else {
+        console.log('❌ OAuth失败:', response.error);
         updateStatus('授权失败: ' + response.error, 'error');
       }
     } catch (error) {
+      console.log('💥 OAuth异常:', error);
       updateStatus('授权失败: ' + error.message, 'error');
     }
 
