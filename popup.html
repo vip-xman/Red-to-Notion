@@ -5,236 +5,191 @@
   <style>
     body {
       width: 350px;
-      padding: 20px;
+      padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
     }
+
+    /* 头部区域 */
     .header {
+      background: linear-gradient(135deg, #ff6b35, #f7931e);
+      color: white;
+      padding: 20px;
       text-align: center;
-      margin-bottom: 20px;
     }
+    
     .title {
       font-size: 18px;
       font-weight: bold;
-      color: #333;
-      margin-bottom: 10px;
+      margin: 0;
     }
+
+    /* 主内容区域 */
+    .main-content {
+      padding: 20px;
+    }
+
+    /* 状态消息 */
     .status {
       padding: 10px;
       border-radius: 8px;
       margin-bottom: 15px;
       text-align: center;
+      font-size: 14px;
     }
-    .status.info {
-      background-color: #e3f2fd;
-      color: #1976d2;
+    .status.info { background-color: #e3f2fd; color: #1976d2; }
+    .status.success { background-color: #e8f5e8; color: #2e7d32; }
+    .status.error { background-color: #ffebee; color: #c62828; }
+
+    /* 未登录状态 */
+    .login-section {
+      text-align: center;
+      padding: 30px 20px;
     }
-    .status.success {
-      background-color: #e8f5e8;
-      color: #2e7d32;
-    }
-    .status.error {
-      background-color: #ffebee;
-      color: #c62828;
-    }
-    .preview {
-      margin-bottom: 15px;
-      padding: 10px;
-      background: #f5f5f5;
-      border-radius: 8px;
-      display: none;
-    }
-    .preview-title {
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: #333;
-    }
-    .preview-content {
+    
+    .login-description {
       color: #666;
+      margin-bottom: 25px;
       font-size: 14px;
-      max-height: 100px;
-      overflow: hidden;
-    }
-    .preview-images {
-      margin-top: 10px;
-    }
-    .preview-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      margin-right: 5px;
-      border-radius: 4px;
-    }
-    .buttons {
-      display: flex;
-      gap: 10px;
-    }
-    button {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .clip-btn {
-      background-color: #ff2442;
-      color: white;
-    }
-    .clip-btn:hover {
-      background-color: #e01e3c;
-    }
-    .clip-btn:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-    .settings-btn {
-      background-color: #f0f0f0;
-      color: #333;
-    }
-    .settings-btn:hover {
-      background-color: #e0e0e0;
-    }
-    .settings-panel {
-      display: none;
-      margin-top: 15px;
-      padding: 15px;
-      background: #f9f9f9;
-      border-radius: 8px;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: #333;
-    }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-    .save-btn {
-      background-color: #4caf50;
-      color: white;
-      width: 100%;
-    }
-    .save-btn:hover {
-      background-color: #45a049;
-    }
-    
-    /* OAuth 和页面选择相关样式 */
-    .auth-section {
-      margin-bottom: 15px;
-      padding: 15px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      background: #fafafa;
-    }
-    
-    .auth-status {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    
-    .workspace-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .workspace-icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
-    }
-    
-    .workspace-name {
-      font-weight: bold;
-      color: #333;
+      line-height: 1.5;
     }
     
     .oauth-btn {
       background: linear-gradient(135deg, #ff6b35, #f7931e);
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 14px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
       cursor: pointer;
       transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
     }
     
     .oauth-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    }
+    
+    .oauth-btn:disabled {
+      opacity: 0.7;
+      transform: none;
+      cursor: not-allowed;
+    }
+
+    /* 已登录状态 */
+    .user-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .workspace-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    
+    .workspace-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #ddd;
+    }
+    
+    .workspace-details h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .workspace-details p {
+      margin: 2px 0 0 0;
+      font-size: 12px;
+      color: #666;
     }
     
     .logout-btn {
       background: #f5f5f5;
+      border: 1px solid #ddd;
       color: #666;
-      font-size: 12px;
       padding: 6px 12px;
-    }
-    
-    .logout-btn:hover {
-      background: #e5e5e5;
-      color: #333;
-    }
-    
-    /* 页面选择器样式 */
-    .page-selector {
-      margin-bottom: 15px;
-    }
-    
-    .page-selector-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    
-    .page-search {
-      margin-bottom: 10px;
-    }
-    
-    .page-search input {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
       border-radius: 6px;
-      font-size: 14px;
-    }
-    
-    .selected-page {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 6px;
+      font-size: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     
-    .selected-page:hover {
-      border-color: #ff6b35;
-      background: #fff7f5;
+    .logout-btn:hover {
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    /* 页面管理区域 */
+    .page-management {
+      margin-bottom: 20px;
+    }
+    
+    .manage-pages-btn {
+      width: 100%;
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .manage-pages-btn:hover {
+      background: #0056b3;
+    }
+
+    /* 默认页面显示 */
+    .default-page-section {
+      margin-bottom: 20px;
+    }
+    
+    .default-page-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .current-page-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+    }
+    
+    .page-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
     }
     
     .page-icon {
       font-size: 16px;
-      width: 20px;
-      text-align: center;
     }
     
     .page-title {
-      flex: 1;
       font-size: 14px;
       color: #333;
       overflow: hidden;
@@ -243,12 +198,88 @@
     }
     
     .change-page-btn {
+      background: none;
+      border: none;
+      color: #007bff;
       font-size: 12px;
-      color: #666;
-      text-decoration: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
     }
     
-    /* 抽屉式页面选择器 */
+    .change-page-btn:hover {
+      background: #f8f9fa;
+    }
+
+    /* 内容预览 */
+    .preview {
+      margin-bottom: 20px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+      display: none;
+    }
+    
+    .preview-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    .preview-content {
+      color: #666;
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    
+    .preview-images {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    
+    .preview-image {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #e9ecef;
+    }
+
+    /* 剪藏按钮 */
+    .clip-section {
+      margin-bottom: 10px;
+    }
+    
+    .clip-btn {
+      width: 100%;
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .clip-btn:hover:not(:disabled) {
+      background: #218838;
+      transform: translateY(-1px);
+    }
+    
+    .clip-btn:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 页面管理抽屉 */
     .page-drawer {
       position: fixed;
       top: 0;
@@ -265,11 +296,13 @@
       right: 0;
       top: 0;
       bottom: 0;
-      width: 320px;
+      width: 380px;
       background: white;
       box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
       transform: translateX(100%);
       transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
     
     .page-drawer.show .drawer-content {
@@ -278,180 +311,275 @@
     
     .drawer-header {
       padding: 20px;
-      border-bottom: 1px solid #e5e5e5;
+      border-bottom: 1px solid #e9ecef;
       background: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     
     .drawer-title {
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 600;
       color: #333;
       margin: 0;
     }
     
     .close-drawer {
-      position: absolute;
-      top: 15px;
-      right: 15px;
       background: none;
       border: none;
       font-size: 24px;
       cursor: pointer;
       color: #666;
       padding: 5px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+    }
+    
+    .close-drawer:hover {
+      background: #e9ecef;
     }
     
     .drawer-body {
-      padding: 20px;
-      height: calc(100vh - 140px);
+      flex: 1;
       overflow-y: auto;
+      padding: 20px;
+    }
+
+    /* 管理页面列表 */
+    .managed-pages-section {
+      margin-bottom: 30px;
     }
     
-    .page-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
     }
     
-    .page-item {
+    .managed-page-item {
       display: flex;
       align-items: center;
-      gap: 12px;
       padding: 12px;
-      border: 1px solid #e5e5e5;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      margin-bottom: 8px;
       background: white;
     }
     
-    .page-item:hover {
-      border-color: #ff6b35;
-      background: #fff7f5;
+    .managed-page-item.default {
+      border-color: #007bff;
+      background: #f8f9ff;
     }
     
-    .page-item.selected {
-      border-color: #ff6b35;
-      background: #fff7f5;
-    }
-    
-    .page-item-icon {
-      font-size: 18px;
-      width: 24px;
-      text-align: center;
-    }
-    
-    .page-item-info {
+    .managed-page-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       flex: 1;
       min-width: 0;
     }
     
-    .page-item-title {
-      font-weight: 500;
+    .managed-page-title {
+      font-size: 14px;
       color: #333;
-      margin-bottom: 4px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
     
-    .page-item-date {
-      font-size: 12px;
-      color: #888;
+    .managed-page-actions {
+      display: flex;
+      gap: 6px;
     }
     
-    .loading-state {
+    .set-default-btn, .remove-page-btn {
+      padding: 4px 8px;
+      border: none;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .set-default-btn {
+      background: #e7f3ff;
+      color: #007bff;
+    }
+    
+    .set-default-btn:hover {
+      background: #cce7ff;
+    }
+    
+    .remove-page-btn {
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    .remove-page-btn:hover {
+      background: #ffcdd2;
+    }
+
+    /* 添加页面区域 */
+    .add-pages-section {
+      border-top: 1px solid #e9ecef;
+      padding-top: 20px;
+    }
+    
+    .page-search {
+      margin-bottom: 15px;
+    }
+    
+    .page-search input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    .page-search input:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+    
+    .available-pages {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .available-page-item {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 40px;
-      color: #666;
+      padding: 10px;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: white;
     }
     
-    .empty-state {
+    .available-page-item:hover {
+      border-color: #007bff;
+      background: #f8f9ff;
+    }
+    
+    .available-page-item.added {
+      border-color: #28a745;
+      background: #f8fff8;
+    }
+    
+    .loading-state, .empty-state {
       text-align: center;
       padding: 40px 20px;
-      color: #888;
+      color: #666;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="title">Red To Notion</div>
+    <h1 class="title">Red To Notion</h1>
   </div>
   
-  <div id="status" class="status info">
-    Please use this tool on Xiaohongshu post pages
-  </div>
-  
-  <div id="preview" class="preview">
-    <div class="preview-title" id="previewTitle"></div>
-    <div class="preview-content" id="previewContent"></div>
-    <div class="preview-images" id="previewImages"></div>
-  </div>
-  
-  <!-- OAuth 授权区域 -->
-  <div class="auth-section">
-    <div id="authStatus" class="auth-status">
-      <div id="notLoggedIn" style="display: none;">
-        <button id="oauthBtn" class="oauth-btn">🚀 一键登录 Notion</button>
+  <div class="main-content">
+    <div id="status" class="status info">正在检查登录状态...</div>
+    
+    <!-- 未登录状态 -->
+    <div id="loginSection" class="login-section" style="display: none;">
+      <div class="login-description">
+        一键登录您的 Notion 账号，<br>
+        安全便捷地剪藏小红书内容
       </div>
-      <div id="loggedIn" style="display: none;">
+      <button id="oauthBtn" class="oauth-btn">
+        🚀 一键登录 Notion
+      </button>
+    </div>
+    
+    <!-- 已登录状态 -->
+    <div id="loggedInSection" style="display: none;">
+      <!-- 用户信息 -->
+      <div class="user-info">
         <div class="workspace-info">
           <img id="workspaceIcon" class="workspace-icon" src="" alt="">
-          <span id="workspaceName" class="workspace-name"></span>
+          <div class="workspace-details">
+            <h3 id="workspaceName">工作区</h3>
+            <p>已连接</p>
+          </div>
         </div>
         <button id="logoutBtn" class="logout-btn">退出登录</button>
       </div>
+      
+      <!-- 页面管理 -->
+      <div class="page-management">
+        <button id="managePagesBtn" class="manage-pages-btn">
+          ⚙️ 管理可访问页面
+        </button>
+      </div>
+      
+      <!-- 默认页面显示 -->
+      <div id="defaultPageSection" class="default-page-section" style="display: none;">
+        <div class="default-page-label">当前默认页面：</div>
+        <div class="current-page-display">
+          <div class="page-info">
+            <span id="defaultPageIcon" class="page-icon">📄</span>
+            <span id="defaultPageTitle" class="page-title">请先添加页面</span>
+          </div>
+          <button id="changePageBtn" class="change-page-btn">更换</button>
+        </div>
+      </div>
+      
+      <!-- 内容预览 -->
+      <div id="preview" class="preview">
+        <div class="preview-title" id="previewTitle"></div>
+        <div class="preview-content" id="previewContent"></div>
+        <div class="preview-images" id="previewImages"></div>
+      </div>
+      
+      <!-- 剪藏按钮 -->
+      <div class="clip-section">
+        <button id="clipBtn" class="clip-btn" disabled>
+          📎 剪藏到 Notion
+        </button>
+      </div>
     </div>
   </div>
-  
-  <!-- 页面选择器 -->
-  <div id="pageSelector" class="page-selector" style="display: none;">
-    <div class="page-selector-header">
-      <label>选择目标页面：</label>
-    </div>
-    <div id="selectedPage" class="selected-page">
-      <span id="selectedPageIcon" class="page-icon">📄</span>
-      <span id="selectedPageTitle" class="page-title">点击选择页面</span>
-      <span class="change-page-btn">选择</span>
-    </div>
-  </div>
-  
-  <div class="buttons">
-    <button id="clipBtn" class="clip-btn" disabled>Clip to Notion</button>
-    <button id="settingsBtn" class="settings-btn">Settings</button>
-  </div>
-  
-  <div id="settingsPanel" class="settings-panel">
-    <div class="form-group">
-      <label for="notionToken">Notion Integration Token:</label>
-      <input type="password" id="notionToken" placeholder="Enter your Notion Token">
-    </div>
-    <div class="form-group">
-      <label for="pageId">Page ID:</label>
-      <input type="text" id="pageId" placeholder="Enter target Notion page ID">
-    </div>
-    <button id="saveBtn" class="save-btn">Save Settings</button>
-  </div>
-  
-  <!-- 页面选择抽屉 -->
+
+  <!-- 页面管理抽屉 -->
   <div id="pageDrawer" class="page-drawer">
     <div class="drawer-content">
       <div class="drawer-header">
-        <h3 class="drawer-title">选择 Notion 页面</h3>
+        <h3 class="drawer-title">管理可访问页面</h3>
         <button class="close-drawer" id="closeDrawer">&times;</button>
       </div>
       <div class="drawer-body">
-        <div class="page-search">
-          <input type="text" id="pageSearchInput" placeholder="搜索页面...">
+        <!-- 已管理的页面 -->
+        <div class="managed-pages-section">
+          <div class="section-title">已添加的页面</div>
+          <div id="managedPagesList">
+            <div class="empty-state" id="noManagedPages">
+              还没有添加任何页面<br>
+              <small>请在下方搜索并添加页面</small>
+            </div>
+          </div>
         </div>
-        <div id="pageListContainer">
-          <div id="loadingPages" class="loading-state">正在加载页面...</div>
-          <div id="pageList" class="page-list" style="display: none;"></div>
-          <div id="emptyPages" class="empty-state" style="display: none;">
-            <p>没有找到可用的页面</p>
-            <small>请确保您的 Notion 工作区中有页面，并且已授权访问权限</small>
+        
+        <!-- 添加新页面 -->
+        <div class="add-pages-section">
+          <div class="section-title">添加新页面</div>
+          <div class="page-search">
+            <input type="text" id="pageSearchInput" placeholder="搜索 Notion 页面...">
+          </div>
+          <div class="available-pages">
+            <div id="loadingPages" class="loading-state">正在加载页面...</div>
+            <div id="availablePagesList" style="display: none;"></div>
+            <div id="emptyPages" class="empty-state" style="display: none;">
+              没有找到页面<br>
+              <small>请确保您的 Notion 工作区中有页面</small>
+            </div>
           </div>
         </div>
       </div>

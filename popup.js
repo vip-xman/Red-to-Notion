@@ -1,67 +1,82 @@
 document.addEventListener('DOMContentLoaded', function() {
   // DOM 元素引用
-  const clipBtn = document.getElementById('clipBtn');
-  const settingsBtn = document.getElementById('settingsBtn');
-  const saveBtn = document.getElementById('saveBtn');
-  const settingsPanel = document.getElementById('settingsPanel');
-  const status = document.getElementById('status');
-  const preview = document.getElementById('preview');
-  
-  // OAuth 相关元素
-  const oauthBtn = document.getElementById('oauthBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const notLoggedIn = document.getElementById('notLoggedIn');
-  const loggedIn = document.getElementById('loggedIn');
-  const workspaceName = document.getElementById('workspaceName');
-  const workspaceIcon = document.getElementById('workspaceIcon');
-  
-  // 页面选择器相关元素
-  const pageSelector = document.getElementById('pageSelector');
-  const selectedPage = document.getElementById('selectedPage');
-  const selectedPageIcon = document.getElementById('selectedPageIcon');
-  const selectedPageTitle = document.getElementById('selectedPageTitle');
-  
-  // 抽屉相关元素
-  const pageDrawer = document.getElementById('pageDrawer');
-  const closeDrawer = document.getElementById('closeDrawer');
-  const pageSearchInput = document.getElementById('pageSearchInput');
-  const pageList = document.getElementById('pageList');
-  const loadingPages = document.getElementById('loadingPages');
-  const emptyPages = document.getElementById('emptyPages');
-  
-  let currentPageData = null;
-  let currentSettings = {};
-  let availablePages = [];
-  let selectedPageData = null;
+  const elements = {
+    // 状态和主要区域
+    status: document.getElementById('status'),
+    loginSection: document.getElementById('loginSection'),
+    loggedInSection: document.getElementById('loggedInSection'),
+    
+    // 登录相关
+    oauthBtn: document.getElementById('oauthBtn'),
+    logoutBtn: document.getElementById('logoutBtn'),
+    workspaceName: document.getElementById('workspaceName'),
+    workspaceIcon: document.getElementById('workspaceIcon'),
+    
+    // 页面管理相关
+    managePagesBtn: document.getElementById('managePagesBtn'),
+    defaultPageSection: document.getElementById('defaultPageSection'),
+    defaultPageIcon: document.getElementById('defaultPageIcon'),
+    defaultPageTitle: document.getElementById('defaultPageTitle'),
+    changePageBtn: document.getElementById('changePageBtn'),
+    
+    // 抽屉相关
+    pageDrawer: document.getElementById('pageDrawer'),
+    closeDrawer: document.getElementById('closeDrawer'),
+    managedPagesList: document.getElementById('managedPagesList'),
+    noManagedPages: document.getElementById('noManagedPages'),
+    pageSearchInput: document.getElementById('pageSearchInput'),
+    loadingPages: document.getElementById('loadingPages'),
+    availablePagesList: document.getElementById('availablePagesList'),
+    emptyPages: document.getElementById('emptyPages'),
+    
+    // 内容和剪藏
+    preview: document.getElementById('preview'),
+    previewTitle: document.getElementById('previewTitle'),
+    previewContent: document.getElementById('previewContent'),
+    previewImages: document.getElementById('previewImages'),
+    clipBtn: document.getElementById('clipBtn')
+  };
+
+  // 状态管理
+  let state = {
+    isLoggedIn: false,
+    currentPageData: null,
+    managedPages: [],
+    defaultPage: null,
+    availablePages: [],
+    oauthToken: null
+  };
 
   // 初始化
   init();
 
   async function init() {
-    await checkAuthStatus();
-    await loadSettings();
-    checkCurrentPage();
     bindEvents();
+    await checkAuthStatus();
+    await loadManagedPages();
+    checkCurrentPage();
   }
 
   function bindEvents() {
-    clipBtn.addEventListener('click', clipToNotion);
-    settingsBtn.addEventListener('click', toggleSettings);
-    saveBtn.addEventListener('click', saveSettings);
+    // OAuth 登录/登出
+    elements.oauthBtn.addEventListener('click', handleOAuthLogin);
+    elements.logoutBtn.addEventListener('click', handleLogout);
     
-    // OAuth 事件
-    oauthBtn.addEventListener('click', handleOAuthLogin);
-    logoutBtn.addEventListener('click', handleLogout);
+    // 页面管理
+    elements.managePagesBtn.addEventListener('click', openPageManager);
+    elements.changePageBtn.addEventListener('click', openPageManager);
+    elements.closeDrawer.addEventListener('click', closePageManager);
     
-    // 页面选择器事件
-    selectedPage.addEventListener('click', openPageSelector);
-    closeDrawer.addEventListener('click', closePageSelector);
-    pageDrawer.addEventListener('click', (e) => {
-      if (e.target === pageDrawer) closePageSelector();
+    // 抽屉点击外部关闭
+    elements.pageDrawer.addEventListener('click', (e) => {
+      if (e.target === elements.pageDrawer) closePageManager();
     });
     
-    // 搜索事件
-    pageSearchInput.addEventListener('input', debounce(handlePageSearch, 300));
+    // 页面搜索
+    elements.pageSearchInput.addEventListener('input', debounce(handlePageSearch, 300));
+    
+    // 剪藏按钮
+    elements.clipBtn.addEventListener('click', clipToNotion);
   }
 
   // 检查认证状态
@@ -69,54 +84,51 @@ document.addEventListener('DOMContentLoaded', function() {
     const result = await chrome.storage.sync.get(['oauthToken', 'workspaceName', 'workspaceIcon', 'authMethod']);
     
     if (result.oauthToken && result.authMethod === 'oauth') {
-      // 已通过OAuth登录
+      state.isLoggedIn = true;
+      state.oauthToken = result.oauthToken;
       showLoggedInState(result);
-      await loadSelectedPage();
     } else {
-      // 未登录或使用手动配置
+      state.isLoggedIn = false;
       showLoggedOutState();
     }
   }
 
   function showLoggedInState(data) {
-    notLoggedIn.style.display = 'none';
-    loggedIn.style.display = 'flex';
-    pageSelector.style.display = 'block';
+    elements.loginSection.style.display = 'none';
+    elements.loggedInSection.style.display = 'block';
     
-    workspaceName.textContent = data.workspaceName || 'Notion Workspace';
+    elements.workspaceName.textContent = data.workspaceName || 'Notion Workspace';
+    
     if (data.workspaceIcon) {
-      workspaceIcon.src = data.workspaceIcon;
-      workspaceIcon.style.display = 'block';
+      elements.workspaceIcon.src = data.workspaceIcon;
+      elements.workspaceIcon.style.display = 'block';
     } else {
-      workspaceIcon.style.display = 'none';
+      elements.workspaceIcon.style.display = 'none';
     }
     
-    currentSettings.authMethod = 'oauth';
-    currentSettings.oauthToken = data.oauthToken;
+    updateStatus('已连接到 Notion', 'success');
   }
 
   function showLoggedOutState() {
-    notLoggedIn.style.display = 'block';
-    loggedIn.style.display = 'none';
-    pageSelector.style.display = 'none';
+    elements.loginSection.style.display = 'block';
+    elements.loggedInSection.style.display = 'none';
     
-    currentSettings.authMethod = 'manual';
+    updateStatus('请先登录 Notion 账号', 'info');
   }
 
   // OAuth 登录处理
   async function handleOAuthLogin() {
-    oauthBtn.disabled = true;
-    oauthBtn.textContent = '🔄 正在授权...';
-    updateStatus('正在跳转到Notion授权页面...', 'info');
+    elements.oauthBtn.disabled = true;
+    elements.oauthBtn.textContent = '🔄 正在授权...';
+    updateStatus('正在跳转到 Notion 授权页面...', 'info');
 
     try {
       const response = await chrome.runtime.sendMessage({ action: 'notionOAuth' });
       
       if (response.success) {
-        updateStatus('授权成功！', 'success');
+        updateStatus('授权成功！正在加载...', 'success');
         await checkAuthStatus();
-        updateStatus('正在加载页面列表...', 'info');
-        await loadPages();
+        await loadManagedPages();
       } else {
         updateStatus('授权失败: ' + response.error, 'error');
       }
@@ -124,163 +136,246 @@ document.addEventListener('DOMContentLoaded', function() {
       updateStatus('授权失败: ' + error.message, 'error');
     }
 
-    oauthBtn.disabled = false;
-    oauthBtn.textContent = '🚀 一键登录 Notion';
+    elements.oauthBtn.disabled = false;
+    elements.oauthBtn.textContent = '🚀 一键登录 Notion';
   }
 
   // 退出登录
   async function handleLogout() {
-    await chrome.storage.sync.remove(['oauthToken', 'workspaceName', 'workspaceIcon', 'workspaceId', 'botId', 'selectedPageId', 'selectedPageTitle', 'selectedPageIcon']);
+    await chrome.storage.sync.clear();
+    state = {
+      isLoggedIn: false,
+      currentPageData: null,
+      managedPages: [],
+      defaultPage: null,
+      availablePages: [],
+      oauthToken: null
+    };
     showLoggedOutState();
-    selectedPageData = null;
+    elements.defaultPageSection.style.display = 'none';
     updateStatus('已退出登录', 'info');
   }
 
-  // 打开页面选择器
-  async function openPageSelector() {
-    pageDrawer.style.display = 'block';
-    setTimeout(() => pageDrawer.classList.add('show'), 10);
+  // 加载已管理的页面
+  async function loadManagedPages() {
+    if (!state.isLoggedIn) return;
     
-    if (availablePages.length === 0) {
-      await loadPages();
-    } else {
-      showPageList();
+    const result = await chrome.storage.sync.get(['managedPages', 'defaultPageId']);
+    state.managedPages = result.managedPages || [];
+    
+    // 更新默认页面
+    if (result.defaultPageId) {
+      state.defaultPage = state.managedPages.find(page => page.id === result.defaultPageId);
+      if (state.defaultPage) {
+        showDefaultPageSection();
+      }
     }
     
-    pageSearchInput.focus();
+    updateManagedPagesList();
+    updateClipButtonState();
   }
 
-  // 关闭页面选择器
-  function closePageSelector() {
-    pageDrawer.classList.remove('show');
-    setTimeout(() => pageDrawer.style.display = 'none', 300);
-  }
-
-  // 加载页面列表
-  async function loadPages(query = '') {
-    if (!currentSettings.oauthToken) {
-      updateStatus('请先登录Notion', 'error');
-      return;
+  function showDefaultPageSection() {
+    if (state.defaultPage) {
+      elements.defaultPageSection.style.display = 'block';
+      elements.defaultPageIcon.textContent = state.defaultPage.icon || '📄';
+      elements.defaultPageTitle.textContent = state.defaultPage.title;
     }
+  }
+
+  // 打开页面管理器
+  async function openPageManager() {
+    elements.pageDrawer.style.display = 'block';
+    setTimeout(() => elements.pageDrawer.classList.add('show'), 10);
+    
+    // 加载可用页面
+    await loadAvailablePages();
+    elements.pageSearchInput.focus();
+  }
+
+  // 关闭页面管理器
+  function closePageManager() {
+    elements.pageDrawer.classList.remove('show');
+    setTimeout(() => elements.pageDrawer.style.display = 'none', 300);
+  }
+
+  // 加载可用页面
+  async function loadAvailablePages(query = '') {
+    if (!state.oauthToken) return;
 
     showLoadingState();
     
     try {
       const response = await chrome.runtime.sendMessage({
         action: 'getNotionPages',
-        accessToken: currentSettings.oauthToken,
+        accessToken: state.oauthToken,
         query: query
       });
       
       if (response.success) {
-        availablePages = response.pages;
-        showPageList();
-        
-        if (availablePages.length === 0) {
-          showEmptyState();
-        }
+        state.availablePages = response.pages;
+        showAvailablePages();
       } else {
-        updateStatus('加载页面失败: ' + response.error, 'error');
         showEmptyState();
+        updateStatus('加载页面失败: ' + response.error, 'error');
       }
     } catch (error) {
-      updateStatus('加载页面失败: ' + error.message, 'error');
       showEmptyState();
+      updateStatus('加载页面失败: ' + error.message, 'error');
     }
   }
 
   function showLoadingState() {
-    loadingPages.style.display = 'block';
-    pageList.style.display = 'none';
-    emptyPages.style.display = 'none';
+    elements.loadingPages.style.display = 'block';
+    elements.availablePagesList.style.display = 'none';
+    elements.emptyPages.style.display = 'none';
   }
 
-  function showPageList() {
-    loadingPages.style.display = 'none';
-    pageList.style.display = 'block';
-    emptyPages.style.display = 'none';
+  function showAvailablePages() {
+    elements.loadingPages.style.display = 'none';
+    elements.availablePagesList.style.display = 'block';
+    elements.emptyPages.style.display = 'none';
     
-    renderPageList();
+    renderAvailablePages();
   }
 
   function showEmptyState() {
-    loadingPages.style.display = 'none';
-    pageList.style.display = 'none';
-    emptyPages.style.display = 'block';
+    elements.loadingPages.style.display = 'none';
+    elements.availablePagesList.style.display = 'none';
+    elements.emptyPages.style.display = 'block';
   }
 
-  function renderPageList() {
-    pageList.innerHTML = '';
+  function renderAvailablePages() {
+    elements.availablePagesList.innerHTML = '';
     
-    availablePages.forEach(page => {
+    state.availablePages.forEach(page => {
+      const isAdded = state.managedPages.some(mp => mp.id === page.id);
+      
       const pageItem = document.createElement('div');
-      pageItem.className = 'page-item';
-      if (selectedPageData && selectedPageData.id === page.id) {
-        pageItem.classList.add('selected');
-      }
+      pageItem.className = `available-page-item ${isAdded ? 'added' : ''}`;
       
       pageItem.innerHTML = `
-        <div class="page-item-icon">${page.icon || '📄'}</div>
-        <div class="page-item-info">
-          <div class="page-item-title">${page.title}</div>
-          <div class="page-item-date">${formatDate(page.last_edited_time)}</div>
+        <div class="page-info">
+          <span class="page-icon">${page.icon || '📄'}</span>
+          <span class="page-title">${page.title}</span>
         </div>
       `;
       
-      pageItem.addEventListener('click', () => selectPage(page));
-      pageList.appendChild(pageItem);
+      if (!isAdded) {
+        pageItem.addEventListener('click', () => addPageToManaged(page));
+      }
+      
+      elements.availablePagesList.appendChild(pageItem);
     });
   }
 
-  function selectPage(page) {
-    selectedPageData = page;
+  // 添加页面到管理列表
+  async function addPageToManaged(page) {
+    // 添加到本地状态
+    state.managedPages.push(page);
+    
+    // 如果是第一个页面，设置为默认
+    if (state.managedPages.length === 1) {
+      state.defaultPage = page;
+      await chrome.storage.sync.set({ defaultPageId: page.id });
+      showDefaultPageSection();
+    }
+    
+    // 保存到 storage
+    await chrome.storage.sync.set({ managedPages: state.managedPages });
     
     // 更新UI
-    selectedPageIcon.textContent = page.icon || '📄';
-    selectedPageTitle.textContent = page.title;
+    updateManagedPagesList();
+    renderAvailablePages();
+    updateClipButtonState();
     
-    // 保存到storage
-    chrome.storage.sync.set({
-      selectedPageId: page.id,
-      selectedPageTitle: page.title,
-      selectedPageIcon: page.icon
-    });
-    
-    // 更新当前设置
-    currentSettings.pageId = page.id;
-    
-    // 关闭抽屉
-    closePageSelector();
-    
-    // 重新渲染页面列表以更新选中状态
-    renderPageList();
-    
-    updateStatus('已选择页面: ' + page.title, 'success');
+    updateStatus(`已添加页面: ${page.title}`, 'success');
   }
 
-  async function loadSelectedPage() {
-    const result = await chrome.storage.sync.get(['selectedPageId', 'selectedPageTitle', 'selectedPageIcon']);
+  // 从管理列表移除页面
+  async function removePageFromManaged(pageId) {
+    state.managedPages = state.managedPages.filter(page => page.id !== pageId);
     
-    if (result.selectedPageId) {
-      selectedPageData = {
-        id: result.selectedPageId,
-        title: result.selectedPageTitle,
-        icon: result.selectedPageIcon
-      };
+    // 如果删除的是默认页面，重新设置默认页面
+    if (state.defaultPage && state.defaultPage.id === pageId) {
+      state.defaultPage = state.managedPages.length > 0 ? state.managedPages[0] : null;
+      const defaultPageId = state.defaultPage ? state.defaultPage.id : null;
+      await chrome.storage.sync.set({ defaultPageId });
       
-      selectedPageIcon.textContent = result.selectedPageIcon || '📄';
-      selectedPageTitle.textContent = result.selectedPageTitle || 'Unknown Page';
-      currentSettings.pageId = result.selectedPageId;
+      if (state.defaultPage) {
+        showDefaultPageSection();
+      } else {
+        elements.defaultPageSection.style.display = 'none';
+      }
     }
+    
+    // 保存到 storage
+    await chrome.storage.sync.set({ managedPages: state.managedPages });
+    
+    // 更新UI
+    updateManagedPagesList();
+    renderAvailablePages();
+    updateClipButtonState();
+  }
+
+  // 设置默认页面
+  async function setDefaultPage(page) {
+    state.defaultPage = page;
+    await chrome.storage.sync.set({ defaultPageId: page.id });
+    showDefaultPageSection();
+    updateManagedPagesList();
+    updateStatus(`已设置默认页面: ${page.title}`, 'success');
+  }
+
+  function updateManagedPagesList() {
+    if (state.managedPages.length === 0) {
+      elements.noManagedPages.style.display = 'block';
+      elements.managedPagesList.innerHTML = '';
+      elements.managedPagesList.appendChild(elements.noManagedPages);
+      return;
+    }
+    
+    elements.noManagedPages.style.display = 'none';
+    elements.managedPagesList.innerHTML = '';
+    
+    state.managedPages.forEach(page => {
+      const isDefault = state.defaultPage && state.defaultPage.id === page.id;
+      
+      const pageItem = document.createElement('div');
+      pageItem.className = `managed-page-item ${isDefault ? 'default' : ''}`;
+      
+      pageItem.innerHTML = `
+        <div class="managed-page-info">
+          <span class="page-icon">${page.icon || '📄'}</span>
+          <span class="managed-page-title">${page.title}</span>
+        </div>
+        <div class="managed-page-actions">
+          ${!isDefault ? `<button class="set-default-btn" data-id="${page.id}">设默认</button>` : '<span style="font-size: 11px; color: #007bff;">默认</span>'}
+          <button class="remove-page-btn" data-id="${page.id}">移除</button>
+        </div>
+      `;
+      
+      // 绑定事件
+      const setDefaultBtn = pageItem.querySelector('.set-default-btn');
+      const removeBtn = pageItem.querySelector('.remove-page-btn');
+      
+      if (setDefaultBtn) {
+        setDefaultBtn.addEventListener('click', () => setDefaultPage(page));
+      }
+      
+      removeBtn.addEventListener('click', () => removePageFromManaged(page.id));
+      
+      elements.managedPagesList.appendChild(pageItem);
+    });
   }
 
   // 页面搜索
   function handlePageSearch(event) {
     const query = event.target.value.trim();
-    loadPages(query);
+    loadAvailablePages(query);
   }
 
-  // 检查当前页面
+  // 检查当前页面内容
   function checkCurrentPage() {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       const currentTab = tabs[0];
@@ -299,15 +394,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (chrome.runtime.lastError) {
           console.error('Chrome runtime error:', chrome.runtime.lastError);
-          updateStatus('无法连接到页面，请刷新后重试。错误：' + chrome.runtime.lastError.message, 'error');
+          updateStatus('无法连接到页面，请刷新后重试', 'error');
           return;
         }
 
         if (response && response.success) {
-          currentPageData = response.data;
+          state.currentPageData = response.data;
           showPreview(response.data);
           updateClipButtonState();
-          updateStatus('已检测到帖子内容，可以开始剪藏', 'success');
+          if (state.isLoggedIn) {
+            updateStatus('已检测到帖子内容，可以开始剪藏', 'success');
+          }
         } else {
           updateStatus(response?.error || '未检测到帖子内容', 'error');
         }
@@ -315,81 +412,58 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  function updateClipButtonState() {
-    if (currentSettings.authMethod === 'oauth') {
-      clipBtn.disabled = !currentPageData || !selectedPageData;
-    } else {
-      clipBtn.disabled = !currentPageData;
-    }
-  }
-
   function showPreview(data) {
-    document.getElementById('previewTitle').textContent = data.title || '无标题';
-    document.getElementById('previewContent').textContent = 
+    elements.previewTitle.textContent = data.title || '无标题';
+    elements.previewContent.textContent = 
       data.content ? (data.content.substring(0, 100) + (data.content.length > 100 ? '...' : '')) : '无内容';
     
-    const imagesContainer = document.getElementById('previewImages');
-    imagesContainer.innerHTML = '';
-    
+    elements.previewImages.innerHTML = '';
     if (data.images && data.images.length > 0) {
-      data.images.slice(0, 5).forEach(imgUrl => {
+      data.images.slice(0, 6).forEach(imgUrl => {
         const img = document.createElement('img');
         img.src = imgUrl;
         img.className = 'preview-image';
         img.onerror = () => img.style.display = 'none';
-        imagesContainer.appendChild(img);
+        elements.previewImages.appendChild(img);
       });
     }
     
-    preview.style.display = 'block';
+    elements.preview.style.display = 'block';
   }
 
-  function updateStatus(message, type) {
-    status.textContent = message;
-    status.className = `status ${type}`;
-  }
-
-  function toggleSettings() {
-    const isVisible = settingsPanel.style.display === 'block';
-    settingsPanel.style.display = isVisible ? 'none' : 'block';
+  function updateClipButtonState() {
+    const canClip = state.isLoggedIn && state.currentPageData && state.defaultPage;
+    elements.clipBtn.disabled = !canClip;
+    
+    if (!state.isLoggedIn) {
+      elements.clipBtn.textContent = '📎 请先登录 Notion';
+    } else if (!state.defaultPage) {
+      elements.clipBtn.textContent = '📎 请先添加页面';
+    } else if (!state.currentPageData) {
+      elements.clipBtn.textContent = '📎 请在小红书页面使用';
+    } else {
+      elements.clipBtn.textContent = '📎 剪藏到 Notion';
+    }
   }
 
   // 剪藏到Notion
   async function clipToNotion() {
-    if (!currentPageData) {
-      updateStatus('没有可剪藏的内容', 'error');
+    if (!state.currentPageData || !state.defaultPage || !state.oauthToken) {
+      updateStatus('缺少必要信息，无法剪藏', 'error');
       return;
     }
 
-    let settings;
-    
-    if (currentSettings.authMethod === 'oauth') {
-      if (!selectedPageData) {
-        updateStatus('请先选择目标页面', 'error');
-        openPageSelector();
-        return;
-      }
-      settings = {
-        notionToken: currentSettings.oauthToken,
-        pageId: selectedPageData.id
-      };
-    } else {
-      settings = await getManualSettings();
-      if (!settings.notionToken || !settings.pageId) {
-        updateStatus('请先配置Notion设置', 'error');
-        toggleSettings();
-        return;
-      }
-    }
-
-    clipBtn.disabled = true;
-    updateStatus('正在剪藏到Notion...', 'info');
+    elements.clipBtn.disabled = true;
+    updateStatus('正在剪藏到 Notion...', 'info');
 
     try {
       const response = await chrome.runtime.sendMessage({
         action: 'clipToNotion',
-        data: currentPageData,
-        settings: settings
+        data: state.currentPageData,
+        settings: {
+          notionToken: state.oauthToken,
+          pageId: state.defaultPage.id
+        }
       });
 
       if (response.success) {
@@ -404,59 +478,12 @@ document.addEventListener('DOMContentLoaded', function() {
     updateClipButtonState();
   }
 
-  async function loadSettings() {
-    const result = await chrome.storage.sync.get(['notionToken', 'pageId']);
-    if (result.notionToken) {
-      document.getElementById('notionToken').value = result.notionToken;
-    }
-    if (result.pageId) {
-      document.getElementById('pageId').value = result.pageId;
-    }
-  }
-
-  function saveSettings() {
-    const notionToken = document.getElementById('notionToken').value.trim();
-    const pageId = document.getElementById('pageId').value.trim();
-
-    if (!notionToken || !pageId) {
-      updateStatus('请填写完整的设置信息', 'error');
-      return;
-    }
-
-    chrome.storage.sync.set({
-      notionToken: notionToken,
-      pageId: pageId,
-      authMethod: 'manual'
-    }, function() {
-      updateStatus('设置保存成功', 'success');
-      settingsPanel.style.display = 'none';
-      currentSettings.authMethod = 'manual';
-      showLoggedOutState();
-    });
-  }
-
-  function getManualSettings() {
-    return new Promise((resolve) => {
-      chrome.storage.sync.get(['notionToken', 'pageId'], function(result) {
-        resolve(result);
-      });
-    });
+  function updateStatus(message, type) {
+    elements.status.textContent = message;
+    elements.status.className = `status ${type}`;
   }
 
   // 工具函数
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 1) return '今天';
-    if (diffDays === 2) return '昨天';
-    if (diffDays <= 7) return `${diffDays} 天前`;
-    
-    return date.toLocaleDateString('zh-CN');
-  }
-
   function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
