@@ -178,7 +178,7 @@ async function handleClipToNotion(data, settings) {
   }
 }
 
-// OAuth授权流程
+// OAuth授权流程 - 使用手动窗口管理方式
 async function handleNotionOAuth() {
   try {
     const CLIENT_ID = '25ed872b-594c-804a-baa6-0037917bc7e3';
@@ -198,38 +198,84 @@ async function handleNotionOAuth() {
     console.log('🔗 OAuth授权URL:', authUrl.toString());
     console.log('🎯 重定向URI:', REDIRECT_URI);
     
-    // 启动OAuth流程 - 修改为匹配回调URL
-    const responseUrl = await chrome.identity.launchWebAuthFlow({
-      url: authUrl.toString(),
-      interactive: true
+    // 使用Chrome tabs API创建新标签页进行OAuth
+    return new Promise((resolve, reject) => {
+      // 创建新标签页
+      chrome.tabs.create({
+        url: authUrl.toString(),
+        active: true
+      }, (tab) => {
+        const tabId = tab.id;
+        console.log('📱 创建OAuth标签页:', tabId);
+        
+        // 监听标签页URL变化
+        const updateListener = (updatedTabId, changeInfo, updatedTab) => {
+          if (updatedTabId === tabId && changeInfo.url) {
+            console.log('🔄 标签页URL变化:', changeInfo.url);
+            
+            // 检查是否是回调URL
+            if (changeInfo.url.includes('red-to-notion.vercel.app/api/auth/callback')) {
+              console.log('✅ 检测到回调URL:', changeInfo.url);
+              
+              // 移除监听器
+              chrome.tabs.onUpdated.removeListener(updateListener);
+              chrome.tabs.onRemoved.removeListener(removeListener);
+              
+              try {
+                // 解析URL参数
+                const url = new URL(changeInfo.url);
+                const code = url.searchParams.get('code');
+                const returnedState = url.searchParams.get('state');
+                
+                console.log('🔍 解析参数 - code:', code, 'state:', returnedState);
+                
+                // 关闭标签页
+                chrome.tabs.remove(tabId);
+                
+                if (!code) {
+                  reject(new Error('授权失败：未获取到授权码'));
+                  return;
+                }
+                
+                if (returnedState !== state) {
+                  console.warn('⚠️ State验证失败，但继续执行 - 发送:', state, '接收:', returnedState);
+                }
+                
+                // 继续token交换流程
+                handleTokenExchange(code, REDIRECT_URI).then(resolve).catch(reject);
+                
+              } catch (error) {
+                chrome.tabs.remove(tabId);
+                reject(error);
+              }
+            }
+          }
+        };
+        
+        // 监听标签页关闭
+        const removeListener = (removedTabId) => {
+          if (removedTabId === tabId) {
+            chrome.tabs.onUpdated.removeListener(updateListener);
+            chrome.tabs.onRemoved.removeListener(removeListener);
+            reject(new Error('OAuth窗口被用户关闭'));
+          }
+        };
+        
+        // 添加监听器
+        chrome.tabs.onUpdated.addListener(updateListener);
+        chrome.tabs.onRemoved.addListener(removeListener);
+      });
     });
     
-    console.log('📥 OAuth返回URL:', responseUrl);
-    
-    // 检查是否成功获取到回调URL
-    if (!responseUrl) {
-      throw new Error('OAuth流程被取消或失败');
-    }
-    
-    // 检查URL是否包含我们的回调域名
-    if (!responseUrl.includes('red-to-notion.vercel.app/api/auth/callback')) {
-      console.log('⚠️ 未检测到预期的回调URL，尝试解析当前URL');
-    }
-    
-    // 解析返回的URL - responseUrl应该是回调URL
-    const urlParams = new URL(responseUrl);
-    const code = urlParams.searchParams.get('code');
-    const returnedState = urlParams.searchParams.get('state');
-    
-    console.log('🔍 解析参数 - code:', code, 'state:', returnedState);
-    
-    if (!code) {
-      throw new Error('授权失败：未获取到授权码。返回URL: ' + responseUrl);
-    }
-    
-    if (returnedState !== state) {
-      console.warn('⚠️ State验证失败，但继续执行 - 发送:', state, '接收:', returnedState);
-    }
+  } catch (error) {
+    console.error('OAuth error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// 独立的token交换函数
+async function handleTokenExchange(code, redirectUri) {
+  try {
     
     // 通过我们的API服务器交换token
     const tokenResponse = await fetch('https://red-to-notion.vercel.app/api/auth/token', {
@@ -239,7 +285,7 @@ async function handleNotionOAuth() {
       },
       body: JSON.stringify({
         code: code,
-        redirect_uri: REDIRECT_URI
+        redirect_uri: redirectUri
       })
     });
     
@@ -276,8 +322,8 @@ async function handleNotionOAuth() {
     };
     
   } catch (error) {
-    console.error('OAuth error:', error);
-    return { success: false, error: error.message };
+    console.error('Token exchange error:', error);
+    throw error;
   }
 }
 

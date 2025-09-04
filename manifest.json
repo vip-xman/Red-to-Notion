@@ -13,7 +13,8 @@
     "activeTab",
     "storage",
     "scripting",
-    "identity"
+    "identity",
+    "tabs"
   ],
   "host_permissions": [
     "https://www.xiaohongshu.com/*",
