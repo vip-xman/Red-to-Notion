@@ -1,70 +1,250 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Red To Notion</title>
+    <title>🎉 恭喜！连接成功啦！</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
-        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    </style>
-</head>
-<body>
-    <h1>Red To Notion API Server</h1>
-    <p>This is the API server for the Red To Notion Chrome extension.</p>
-    
-    <h2>API Endpoints:</h2>
-    <ul>
-        <li><strong>POST /api/auth/token</strong> - Exchange OAuth code for access token</li>
-        <li><strong>GET /api/auth/callback</strong> - OAuth callback handler</li>
-        <li><strong>POST /api/notion/pages</strong> - Get user's Notion pages</li>
-    </ul>
-    
-    <div id="test-results">
-        <h2>Testing API Endpoints:</h2>
-    </div>
-
-    <script>
-        async function testEndpoints() {
-            const results = document.getElementById('test-results');
-            
-            // Test callback endpoint
-            try {
-                const response = await fetch('/api/auth/callback');
-                const isOk = response.ok;
-                results.innerHTML += `
-                    <div class="status ${isOk ? 'success' : 'error'}">
-                        GET /api/auth/callback: ${response.status} ${response.statusText}
-                    </div>
-                `;
-            } catch (error) {
-                results.innerHTML += `
-                    <div class="status error">
-                        GET /api/auth/callback: Error - ${error.message}
-                    </div>
-                `;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 20px;
+            position: relative;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
             }
-            
-            // Test token endpoint
-            try {
-                const response = await fetch('/api/auth/token');
-                const isOk = response.status === 405; // Should be Method Not Allowed for GET
-                results.innerHTML += `
-                    <div class="status ${isOk ? 'success' : 'error'}">
-                        GET /api/auth/token: ${response.status} ${response.statusText} ${isOk ? '(Expected)' : '(Unexpected)'}
-                    </div>
-                `;
-            } catch (error) {
-                results.innerHTML += `
-                    <div class="status error">
-                        GET /api/auth/token: Error - ${error.message}
-                    </div>
-                `;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
         
-        // Run tests when page loads
-        testEndpoints();
+        .success-icon {
+            font-size: 100px;
+            margin-bottom: 25px;
+            animation: bounce 1s ease-out 0.5s both;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+                transform: translateZ(0);
+            }
+            40%, 43% {
+                animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+                transform: translate3d(0, -20px, 0);
+            }
+            70% {
+                animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+                transform: translate3d(0, -10px, 0);
+            }
+            90% {
+                transform: translate3d(0, -3px, 0);
+            }
+        }
+        
+        .main-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            animation: fadeIn 0.8s ease-out 1s both;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            animation: fadeIn 0.8s ease-out 1.2s both;
+        }
+        
+        .funny-text {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            font-size: 16px;
+            line-height: 1.5;
+            animation: fadeIn 0.8s ease-out 1.4s both;
+        }
+        
+        .instruction {
+            font-size: 15px;
+            color: #888;
+            margin-top: 25px;
+            line-height: 1.5;
+            animation: fadeIn 0.8s ease-out 1.6s both;
+        }
+        
+        .countdown {
+            display: inline-block;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ff6b35;
+            animation: confetti-fall 4s linear infinite;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .close-hint {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+            animation: fadeIn 0.8s ease-out 1.8s both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">🎊</div>
+        <h1 class="main-title">牵手成功！</h1>
+        <p class="subtitle">
+            恭喜！你和 Notion 完成了一次完美的"数字相亲"！<br>
+            从此以后，你们就是最佳拍档啦～
+        </p>
+        
+        <div class="funny-text">
+            🚀 数字红娘 Red To Notion 使命达成！<br>
+            🎯 现在可以愉快地剪藏小红书内容到 Notion 啦！<br>
+            ✨ 每一次剪藏都是你们友谊的见证～
+        </div>
+        
+        <p class="instruction">
+            📱 这个页面已经完成了它的历史使命<br>
+            <span class="countdown">5</span>秒后华丽退场...<br>
+            🔙 快回到浏览器插件开始你的剪藏之旅吧！
+        </p>
+        
+        <div class="close-hint">
+            💡 小贴士：点击页面任意位置也可以立即关闭哦～
+        </div>
+    </div>
+
+    <script>
+        // 生成庆祝彩带
+        function createConfetti() {
+            const colors = ['#ff6b35', '#f7931e', '#667eea', '#764ba2', '#28a745', '#ffc107', '#e91e63'];
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 4 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    // 清理元素
+                    setTimeout(() => {
+                        if (confetti.parentNode) {
+                            confetti.remove();
+                        }
+                    }, 7000);
+                }, i * 150);
+            }
+        }
+        
+        // 倒计时功能
+        let countdown = 5;
+        const countdownEl = document.querySelector('.countdown');
+        
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdownEl) {
+                countdownEl.textContent = countdown;
+            }
+            
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                if (countdownEl) {
+                    countdownEl.parentElement.innerHTML = 
+                        '👋 拜拜啦！窗口正在关闭...<br>🎉 感谢使用 Red To Notion！';
+                }
+                
+                // 尝试关闭窗口
+                setTimeout(() => {
+                    window.close();
+                }, 1000);
+            }
+        }, 1000);
+        
+        // 启动彩带庆祝动画
+        setTimeout(createConfetti, 1200);
+        
+        // 点击任意位置关闭窗口
+        document.addEventListener('click', () => {
+            clearInterval(countdownInterval);
+            document.querySelector('.instruction').innerHTML = 
+                '👋 感谢使用！窗口正在关闭...';
+            setTimeout(() => {
+                window.close();
+            }, 500);
+        });
+        
+        // 键盘快捷键关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Enter') {
+                clearInterval(countdownInterval);
+                window.close();
+            }
+        });
     </script>
 </body>
 </html>
