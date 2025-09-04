@@ -47,6 +47,66 @@ document.addEventListener('DOMContentLoaded', function() {
     oauthToken: null
   };
 
+  // Toast 通知功能
+  function showToast(title, message, type = 'success', duration = 3000) {
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
+    
+    // 创建toast元素
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    // 根据类型设置图标
+    const icons = {
+      success: '✅',
+      error: '❌',
+      info: 'ℹ️'
+    };
+    
+    toast.innerHTML = `
+      <div class="toast-icon">${icons[type] || icons.success}</div>
+      <div class="toast-content">
+        <div class="toast-title">${title}</div>
+        ${message ? `<div class="toast-message">${message}</div>` : ''}
+      </div>
+      <button class="toast-close">&times;</button>
+    `;
+    
+    // 添加到容器
+    toastContainer.appendChild(toast);
+    
+    // 显示动画
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+    
+    // 关闭按钮事件
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => {
+      hideToast(toast);
+    });
+    
+    // 自动隐藏
+    if (duration > 0) {
+      setTimeout(() => {
+        hideToast(toast);
+      }, duration);
+    }
+    
+    return toast;
+  }
+  
+  function hideToast(toast) {
+    if (!toast || !toast.parentNode) return;
+    
+    toast.classList.remove('show');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }
+
   // 初始化
   init();
 
@@ -113,7 +173,13 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.loginSection.style.display = 'none';
     elements.loggedInSection.style.display = 'block';
     
-    elements.workspaceName.textContent = data.workspaceName || 'Notion Workspace';
+    // 显示主要内容区域
+    const mainContent = document.getElementById('mainContent');
+    const loginPrompt = document.getElementById('loginPrompt');
+    if (mainContent) mainContent.style.display = 'block';
+    if (loginPrompt) loginPrompt.style.display = 'none';
+    
+    elements.workspaceName.textContent = data.workspaceName || 'Workspace';
     
     if (data.workspaceIcon) {
       elements.workspaceIcon.src = data.workspaceIcon;
@@ -122,14 +188,20 @@ document.addEventListener('DOMContentLoaded', function() {
       elements.workspaceIcon.style.display = 'none';
     }
     
-    updateStatus('已连接到 Notion', 'success');
+    elements.status.style.display = 'none';
   }
 
   function showLoggedOutState() {
     elements.loginSection.style.display = 'block';
     elements.loggedInSection.style.display = 'none';
     
-    updateStatus('请先登录 Notion 账号', 'info');
+    // 显示登录提示
+    const mainContent = document.getElementById('mainContent');
+    const loginPrompt = document.getElementById('loginPrompt');
+    if (mainContent) mainContent.style.display = 'none';
+    if (loginPrompt) loginPrompt.style.display = 'block';
+    
+    elements.status.style.display = 'none';
   }
 
   // OAuth 登录处理
@@ -501,11 +573,38 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
       if (response.success) {
-        updateStatus('剪藏成功！', 'success');
+        // 显示成功Toast通知
+        showToast(
+          '剪藏成功！', 
+          `已保存到 "${state.defaultPage.title}"`,
+          'success',
+          4000
+        );
+        updateStatus('', 'success'); // 清空状态栏
+        
+        // 重置按钮文字，暗示可以继续剪藏
+        setTimeout(() => {
+          if (elements.clipBtn) {
+            elements.clipBtn.textContent = '📎 继续剪藏';
+          }
+        }, 500);
+        
       } else {
+        showToast(
+          '剪藏失败',
+          response.error,
+          'error',
+          5000
+        );
         updateStatus('剪藏失败: ' + response.error, 'error');
       }
     } catch (error) {
+      showToast(
+        '剪藏失败',
+        error.message,
+        'error',
+        5000
+      );
       updateStatus('剪藏失败: ' + error.message, 'error');
     }
 

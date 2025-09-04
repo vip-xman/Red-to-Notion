@@ -4,3 +4,6 @@ dist/
 .DS_Store
 .vscode/
 *.zip
+
+# 对话记录文件
+conversation-*.txt
