@@ -55,6 +55,17 @@ document.addEventListener('DOMContentLoaded', function() {
     await checkAuthStatus();
     await loadManagedPages();
     checkCurrentPage();
+    
+    // 监听storage变化以更新状态
+    chrome.storage.onChanged.addListener((changes, namespace) => {
+      console.log('📦 Storage变化:', changes, namespace);
+      if (changes.oauthToken || changes.authMethod) {
+        console.log('🔄 检测到认证状态变化，重新检查状态');
+        checkAuthStatus().then(() => {
+          loadManagedPages();
+        });
+      }
+    });
   }
 
   function bindEvents() {
@@ -134,11 +145,22 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('📥 收到OAuth响应:', response);
       
       if (response.success) {
-        console.log('✅ OAuth成功，检查认证状态');
+        console.log('✅ OAuth成功，强制更新状态');
         updateStatus('授权成功！正在加载...', 'success');
-        await checkAuthStatus();
-        await loadManagedPages();
-        console.log('🔄 状态更新完成');
+        
+        // 强制延迟一下确保storage写入完成
+        setTimeout(async () => {
+          console.log('🔄 延迟后检查认证状态');
+          await checkAuthStatus();
+          await loadManagedPages();
+          console.log('🔄 状态更新完成，当前登录状态:', state.isLoggedIn);
+          
+          // 强制刷新UI
+          if (state.isLoggedIn) {
+            const result = await chrome.storage.sync.get(['workspaceName', 'workspaceIcon']);
+            showLoggedInState(result);
+          }
+        }, 500);
       } else {
         console.log('❌ OAuth失败:', response.error);
         updateStatus('授权失败: ' + response.error, 'error');
