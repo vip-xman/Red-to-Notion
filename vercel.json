@@ -1,13 +1,13 @@
 {
   "functions": {
     "api/auth/token.js": {
-      "runtime": "@vercel/node@3.1.0"
+      "runtime": "@vercel/node@3.0.31"
     },
     "api/auth/callback.js": {
-      "runtime": "@vercel/node@3.1.0"
+      "runtime": "@vercel/node@3.0.31"
     },
     "api/notion/pages.js": {
-      "runtime": "@vercel/node@3.1.0"
+      "runtime": "@vercel/node@3.0.31"
     }
   }
 }
