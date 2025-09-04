@@ -26,23 +26,34 @@ export default async function handler(req, res) {
 
     // If we have a code, this is a successful callback
     if (code) {
-      // Return a simple HTML page that closes itself
-      // The extension will capture this URL before the page loads
+      // For Chrome Extension OAuth flow, we need to redirect to a chrome-extension:// URL
+      // that the extension can intercept, or return the callback URL in a specific format
       return res.status(200).send(`
         <!DOCTYPE html>
         <html>
         <head>
           <title>Authorization Successful</title>
+          <script>
+            // Immediately redirect to signal success to the extension
+            if (window.opener) {
+              // If opened in popup, communicate with parent
+              window.opener.postMessage({
+                type: 'NOTION_OAUTH_SUCCESS',
+                code: '${code}',
+                state: '${state || ''}'
+              }, '*');
+              window.close();
+            } else {
+              // For chrome.identity flow, just close after a short delay
+              setTimeout(() => {
+                window.close();
+              }, 500);
+            }
+          </script>
         </head>
         <body>
           <h2>Authorization successful!</h2>
-          <p>You can close this window.</p>
-          <script>
-            // Try to close the window
-            setTimeout(() => {
-              window.close();
-            }, 1000);
-          </script>
+          <p>Redirecting back to extension...</p>
         </body>
         </html>
       `);

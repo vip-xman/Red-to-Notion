@@ -206,10 +206,12 @@ async function handleNotionOAuth() {
     
     console.log('📥 OAuth返回URL:', responseUrl);
     
-    // 解析返回的URL
+    // 解析返回的URL - responseUrl应该是回调URL
     const urlParams = new URL(responseUrl);
     const code = urlParams.searchParams.get('code');
     const returnedState = urlParams.searchParams.get('state');
+    
+    console.log('🔍 解析参数 - code:', code, 'state:', returnedState);
     
     if (!code) {
       throw new Error('授权失败：未获取到授权码');
