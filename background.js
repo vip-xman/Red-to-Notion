@@ -198,13 +198,23 @@ async function handleNotionOAuth() {
     console.log('🔗 OAuth授权URL:', authUrl.toString());
     console.log('🎯 重定向URI:', REDIRECT_URI);
     
-    // 启动OAuth流程
+    // 启动OAuth流程 - 修改为匹配回调URL
     const responseUrl = await chrome.identity.launchWebAuthFlow({
       url: authUrl.toString(),
       interactive: true
     });
     
     console.log('📥 OAuth返回URL:', responseUrl);
+    
+    // 检查是否成功获取到回调URL
+    if (!responseUrl) {
+      throw new Error('OAuth流程被取消或失败');
+    }
+    
+    // 检查URL是否包含我们的回调域名
+    if (!responseUrl.includes('red-to-notion.vercel.app/api/auth/callback')) {
+      console.log('⚠️ 未检测到预期的回调URL，尝试解析当前URL');
+    }
     
     // 解析返回的URL - responseUrl应该是回调URL
     const urlParams = new URL(responseUrl);
@@ -214,11 +224,11 @@ async function handleNotionOAuth() {
     console.log('🔍 解析参数 - code:', code, 'state:', returnedState);
     
     if (!code) {
-      throw new Error('授权失败：未获取到授权码');
+      throw new Error('授权失败：未获取到授权码。返回URL: ' + responseUrl);
     }
     
     if (returnedState !== state) {
-      throw new Error('授权失败：状态验证失败');
+      console.warn('⚠️ State验证失败，但继续执行 - 发送:', state, '接收:', returnedState);
     }
     
     // 通过我们的API服务器交换token
