@@ -270,11 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
         : data.content;
       
       elements.previewContent.innerHTML = `
-        ${data.content.length > 100 
-          ? `<span class="preview-text-short">${content}</span>
-             <button class="expand-btn" onclick="this.parentElement.innerHTML='${data.content.replace(/'/g, "\\'")}'">展开全部</button>`
-          : content
-        }
+        <span class="preview-text-short">${content}</span>
       `;
       elements.previewContent.style.display = 'block';
     } else {
