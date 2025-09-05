@@ -6,9 +6,14 @@
     body {
       width: 400px;
       min-width: 400px;
+      height: 600px;
+      min-height: 600px;
       padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     /* 头部状态栏 */
@@ -19,6 +24,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
     
     .title {
@@ -99,6 +105,10 @@
     /* 主内容区域 */
     .main-content {
       padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
     
     /* 未登录提示 */
@@ -131,6 +141,9 @@
     /* 主要功能区 */
     .main-section {
       margin-top: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     
     /* 目标页面选择 */
@@ -416,7 +429,9 @@
 
     /* 剪藏按钮 */
     .clip-section {
-      margin-bottom: 10px;
+      margin-top: auto;
+      margin-bottom: 0;
+      padding-top: 16px;
     }
     
     .clip-btn {
