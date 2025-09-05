@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>内容预览测试</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    .demo {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>内容预览功能测试</h1>
+  
+  <div class="demo">
+    <h3>测试场景 1: 完整内容</h3>
+    <p><strong>标题：</strong>今天在星巴克发现了新口味</p>
+    <p><strong>内容：</strong>今天和朋友去星巴克，意外发现了一款新的季节限定饮品！芝士奶盖配上焦糖玛奇朵，口感层次很丰富，推荐给大家试试～价格稍微贵一点，但是真的值得。</p>
+    <p><strong>图片：</strong>3张</p>
+    <p><strong>标签：</strong>#星巴克 #新品尝试 #咖啡</p>
+  </div>
+
+  <div class="demo">
+    <h3>测试场景 2: 长文本内容</h3>
+    <p><strong>标题：</strong>详细护肤心得分享</p>
+    <p><strong>内容：</strong>最近很多小伙伴问我护肤的问题，今天就来详细分享一下我的护肤心得。首先要说的是，护肤真的是一个长期的过程，不能急于求成。我从大学开始就很注重护肤，到现在已经有五六年的时间了。期间试过很多产品，有好用的也有踩过的雷。今天主要想分享几个我觉得特别好用的产品，以及一些护肤的小技巧。希望对大家有帮助！</p>
+    <p><strong>图片：</strong>8张</p>
+    <p><strong>标签：</strong>#护肤分享 #美妆好物 #护肤心得 #美容 #护肤品推荐 #日常护肤 #美妆</p>
+  </div>
+
+  <div class="demo">
+    <h3>测试场景 3: 仅图片内容</h3>
+    <p><strong>标题：</strong>今日穿搭</p>
+    <p><strong>内容：</strong>（无文字内容）</p>
+    <p><strong>图片：</strong>5张</p>
+    <p><strong>标签：</strong>#OOTD #穿搭</p>
+  </div>
+
+  <script>
+    // 模拟测试数据
+    const testData = [
+      {
+        title: "今天在星巴克发现了新口味",
+        content: "今天和朋友去星巴克，意外发现了一款新的季节限定饮品！芝士奶盖配上焦糖玛奇朵，口感层次很丰富，推荐给大家试试～价格稍微贵一点，但是真的值得。",
+        images: ["img1.jpg", "img2.jpg", "img3.jpg"],
+        tags: ["星巴克", "新品尝试", "咖啡"],
+        url: "https://xiaohongshu.com/test1"
+      },
+      {
+        title: "详细护肤心得分享", 
+        content: "最近很多小伙伴问我护肤的问题，今天就来详细分享一下我的护肤心得。首先要说的是，护肤真的是一个长期的过程，不能急于求成。我从大学开始就很注重护肤，到现在已经有五六年的时间了。期间试过很多产品，有好用的也有踩过的雷。今天主要想分享几个我觉得特别好用的产品，以及一些护肤的小技巧。希望对大家有帮助！",
+        images: ["img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg", "img6.jpg", "img7.jpg", "img8.jpg"],
+        tags: ["护肤分享", "美妆好物", "护肤心得", "美容", "护肤品推荐", "日常护肤", "美妆"],
+        url: "https://xiaohongshu.com/test2"
+      },
+      {
+        title: "今日穿搭",
+        content: "",
+        images: ["img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg"],
+        tags: ["OOTD", "穿搭"],
+        url: "https://xiaohongshu.com/test3"
+      }
+    ];
+    
+    console.log('测试数据已加载:', testData);
+  </script>
+</body>
+</html>

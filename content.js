@@ -17,6 +17,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 function extractXiaohongshuContent() {
   const url = window.location.href;
+  console.log('Extracting content from URL:', url);
+  
+  // 检查是否为详情页
+  const isDetailPage = url.includes('/explore/') && url.length > url.indexOf('/explore/') + 20;
   
   // 支持多种小红书URL格式
   const isXiaohongshuPost = url.includes('xiaohongshu.com/explore/') || 
@@ -26,6 +30,8 @@ function extractXiaohongshuContent() {
   if (!isXiaohongshuPost) {
     throw new Error('当前页面不是小红书帖子页面，URL: ' + url);
   }
+  
+  console.log('Is detail page:', isDetailPage);
 
   const data = {
     title: '',
@@ -48,37 +54,133 @@ function extractXiaohongshuContent() {
 }
 
 function extractTitle() {
-  // 小红书特定的标题选择器
-  const selectors = [
-    '.note-detail-mask .note-title',
-    '.note-detail .note-title', 
-    '[class*="note-title"]',
-    '.note-content .title',
-    '.detail-title',
-    'h1',
-    '.title',
-    '[class*="title"]'
+  console.log('=== 标题提取开始 ===');
+  
+  // 首先尝试找到当前活跃的帖子容器
+  const containerSelectors = [
+    '.note-detail-mask',    // 弹窗模态框
+    '.note-detail',         // 详情页容器
+    '.modal-content',       // 通用模态框
+    '.popup-content'        // 弹窗内容
   ];
 
-  for (const selector of selectors) {
-    const element = document.querySelector(selector);
-    if (element && element.textContent.trim()) {
-      return element.textContent.trim();
+  let activeContainer = null;
+  for (const containerSelector of containerSelectors) {
+    const container = document.querySelector(containerSelector);
+    if (container) {
+      console.log(`找到活跃容器: ${containerSelector}`);
+      activeContainer = container;
+      break;
     }
   }
 
-  // 优先使用 og:title，通常比 document.title 更准确
+  // 在容器内或整个文档中搜索标题
+  const searchContext = activeContainer || document;
+  console.log(`搜索范围: ${activeContainer ? '活跃容器' : '整个文档'}`);
+
+  // 优先级排序的选择器
+  const titleSelectors = [
+    '.note-title',          // 最具体的标题选择器
+    '[class*="note-title"]', // 包含note-title的class
+    'h1',                   // 标准标题元素
+    '.title',              // 通用标题class
+    '[class*="title"]'     // 包含title的class
+  ];
+
+  // 需要过滤的UI文本
+  const uiFilters = [
+    '温馨提示', '提示', '小红书', 'Xiaohongshu',
+    '登录', '注册', '关注', '点赞', '评论', '分享', '收藏',
+    '更多', '查看更多', '展开', '收起', 
+    'App', '下载', '立即下载', '打开App', '去App查看'
+  ];
+
+  console.log('开始遍历选择器...');
+  for (const selector of titleSelectors) {
+    console.log(`\n检查选择器: ${selector}`);
+    
+    const elements = searchContext.querySelectorAll(selector);
+    console.log(`找到 ${elements.length} 个匹配元素`);
+    
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i];
+      const text = element.textContent.trim();
+      
+      console.log(`  元素 ${i + 1}: "${text}"`);
+      console.log(`  元素位置: ${element.getBoundingClientRect().left}, ${element.getBoundingClientRect().top}`);
+      console.log(`  父元素class: ${element.parentElement?.className || 'none'}`);
+      
+      if (!text) {
+        console.log('  → 跳过: 内容为空');
+        continue;
+      }
+      
+      if (uiFilters.includes(text)) {
+        console.log('  → 跳过: 匹配UI过滤器');
+        continue;
+      }
+      
+      if (text.length < 2 || text.length > 200) {
+        console.log(`  → 跳过: 长度不合理 (${text.length} 字符)`);
+        continue;
+      }
+      
+      // 检查是否来自其他帖子
+      const isFromFeedItem = element.closest('.note-item') && 
+                           !element.closest('.note-detail') && 
+                           !element.closest('.note-detail-mask');
+      
+      if (isFromFeedItem) {
+        console.log('  → 跳过: 来自feed列表中的其他帖子');
+        continue;
+      }
+      
+      console.log(`  ✓ 找到有效标题: "${text}"`);
+      console.log('=== 标题提取完成 ===');
+      return text;
+    }
+  }
+
+  // 尝试meta标签
+  console.log('\n检查meta标签...');
   const metaTitle = document.querySelector('meta[property="og:title"]');
   if (metaTitle && metaTitle.content.trim()) {
-    return metaTitle.content.trim();
+    const title = metaTitle.content.trim();
+    console.log(`Meta标题: "${title}"`);
+    
+    if (!uiFilters.includes(title) && 
+        title !== '小红书' && 
+        !title.includes('小红书') &&
+        title.length > 1 && 
+        title.length < 200) {
+      console.log('✓ 使用Meta标题');
+      console.log('=== 标题提取完成 ===');
+      return title;
+    } else {
+      console.log('→ Meta标题被过滤');
+    }
   }
 
-  // 最后使用 document.title
-  const docTitle = document.title.replace(' - 小红书', '').trim();
-  if (docTitle && docTitle !== '小红书') {
-    return docTitle;
+  // 尝试document.title，但要严格验证
+  console.log('\n检查document.title...');
+  const docTitle = document.title.replace(' - 小红书', '').replace('小红书 - ', '').trim();
+  if (docTitle && docTitle !== '小红书' && !uiFilters.includes(docTitle)) {
+    console.log(`Document标题: "${docTitle}"`);
+    
+    // 严格验证document.title是否为真正的标题
+    const isTitleLike = docTitle.length <= 50;  // 标题通常不超过50字符
+    
+    if (isTitleLike) {
+      console.log('✓ Document标题符合标题格式，使用');
+      console.log('=== 标题提取完成 ===');
+      return docTitle;
+    } else {
+      console.log(`→ Document标题被过滤: 长度${docTitle.length}字符，超过50字符限制`);
+    }
   }
 
+  console.log('未找到有效标题，返回空字符串');
+  console.log('=== 标题提取完成 ===');
   return '';
 }
 
