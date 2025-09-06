@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     currentPageData: null,
     currentPage: null,
     allPages: [],
-    frequentPages: [],
     accessToken: null,
     workspace: null,
     currentView: 'welcome' // welcome, main, success
@@ -50,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
     pageDrawer: document.getElementById('pageDrawer'),
     drawerBackBtn: document.getElementById('drawerBackBtn'),
     pageSearchInput: document.getElementById('pageSearchInput'),
-    frequentPagesList: document.getElementById('frequentPagesList'),
     allPagesList: document.getElementById('allPagesList'),
     pagesLoading: document.getElementById('pagesLoading'),
     pagesEmpty: document.getElementById('pagesEmpty'),
@@ -164,8 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
           ${AppState.workspace?.icon ? `<img src="${AppState.workspace.icon}" style="width: 16px; height: 16px; border-radius: 3px;">` : ''}
           <span>${AppState.workspace?.name || 'Workspace'}</span>
         </div>
-        <button id="logoutBtn" class="btn-icon" style="background: rgba(255,255,255,0.1); color: white;" title="退出登录">
-          <span>↗</span>
+        <button id="logoutBtn" class="btn-icon" style="background: transparent; color: white;" title="退出登录">
+          <img src="images/logout-icon.svg" style="width: 16px; height: 16px; filter: brightness(0) invert(1);">
         </button>
       </div>
     `;
@@ -325,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function updatePageSelector() {
     if (AppState.currentPage) {
       elements.currentPageIcon.textContent = AppState.currentPage.icon || '📄';
-      elements.currentPageTitle.textContent = AppState.currentPage.title;
+      elements.currentPageTitle.textContent = AppState.currentPage.title.length > 12 ? AppState.currentPage.title.substring(0, 12) + '...' : AppState.currentPage.title;
     } else {
       elements.currentPageIcon.textContent = '📄';
       elements.currentPageTitle.textContent = '选择页面';
@@ -389,10 +387,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function renderPageLists() {
-    // Render frequent pages (recent or most used)
-    AppState.frequentPages = AppState.allPages.slice(0, 3);
-    renderPageList(elements.frequentPagesList, AppState.frequentPages);
-    
     // Render all pages
     renderPageList(elements.allPagesList, AppState.allPages);
   }
@@ -413,14 +407,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="page-item-info">
           <div class="page-item-title">
             <span>${page.icon || '📄'}</span>
-            <span>${page.title}</span>
+            <span>${page.title.length > 12 ? page.title.substring(0, 12) + '...' : page.title}</span>
           </div>
           <div class="page-item-meta">更新于 ${getRelativeTime(page.last_edited_time)}</div>
         </div>
         <div class="page-item-action">
           ${AppState.currentPage?.id === page.id 
             ? '<span class="page-badge">默认</span>' 
-            : '<span class="page-badge secondary">选择</span>'
+            : '<span class="page-badge secondary">切换</span>'
           }
         </div>
       `;
@@ -448,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateClipButton();
     closePageDrawer();
     
-    showToast('设置成功', `默认保存到「${page.title}」`, 'success');
+    showToast('设置成功', `默认保存到「${page.title.length > 10 ? page.title.substring(0, 10) + '...' : page.title}」`, 'success', 2000);
   }
 
   function handlePageSearch(event) {
@@ -522,7 +516,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update success page info
     elements.successPageIcon.textContent = AppState.currentPage?.icon || '📄';
-    elements.successPageName.textContent = AppState.currentPage?.title || '我的页面';
+    const pageTitle = AppState.currentPage?.title || '我的页面';
+    elements.successPageName.textContent = pageTitle.length > 15 ? pageTitle.substring(0, 15) + '...' : pageTitle;
     
     switchPageState(elements.successState);
   }
@@ -572,14 +567,12 @@ document.addEventListener('DOMContentLoaded', function() {
         ${message ? `<div class="toast-message">${message}</div>` : ''}
       </div>
       <button class="toast-close" aria-label="关闭">&times;</button>
-      <div class="toast-progress" style="width: 100%;"></div>
     `;
 
     elements.toastContainer.appendChild(toast);
     
-    // Find close button and progress bar
+    // Find close button
     const closeBtn = toast.querySelector('.toast-close');
-    const progress = toast.querySelector('.toast-progress');
     
     // Close button handler
     closeBtn.addEventListener('click', () => {
@@ -591,12 +584,8 @@ document.addEventListener('DOMContentLoaded', function() {
       toast.classList.add('show');
     }, 10);
 
-    // Progress animation
+    // Auto remove
     if (duration > 0) {
-      progress.style.transition = `width ${duration}ms linear`;
-      setTimeout(() => {
-        progress.style.width = '0%';
-      }, 100);
 
       // Auto remove
       setTimeout(() => {
