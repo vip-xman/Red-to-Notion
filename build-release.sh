@@ -73,3 +73,10 @@ echo "   - [ ] 填写商店信息 (使用 STORE_DESCRIPTION.md)"
 echo "   - [ ] 上传宣传图片和截图"
 echo "   - [ ] 设置隐私政策链接"
 echo "   - [ ] 提交审核"
+
+# 清理临时目录
+echo ""
+echo "🧹 清理临时文件..."
+echo "Cleaning up temporary files..."
+rm -rf "$RELEASE_DIR/temp"
+echo "✨ 清理完成! Cleanup completed!"
