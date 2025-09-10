@@ -6,8 +6,11 @@
 ![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-green)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue)
 ![Notion API](https://img.shields.io/badge/Notion-API-black)
+![Release Status](https://img.shields.io/badge/Status-Chrome%20Web%20Store%20Review-yellow)
 
 *将小红书精彩内容一键保存到你的 Notion 工作区* ✨
+
+**🎉 v1.0.0 正式版已发布！Chrome Web Store 审核中...**
 
 </div>
 
@@ -37,7 +40,7 @@
 ### 🎨 用户体验优化
 - **现代化界面**：采用 Notion 设计语言，界面简洁优雅
 - **智能预览**：内容预览支持标题、正文、图片、标签完整展示
-- **页面管理**：支持页面搜索、切换，最多显示12字符标题避免溢出
+- **页面管理**：支持页面搜索、切换
 - **Toast通知**：简洁的成功反馈通知
 - **响应式设计**：完美适配各种屏幕尺寸
 
@@ -89,9 +92,11 @@
 
 ## 🚀 快速开始
 
-### 📦 方式一：直接安装 (推荐)
+### 📦 方式一：Chrome Web Store 安装 (推荐)
 
-> 🎯 **即将上架 Chrome Web Store，敬请期待！**
+> 🎯 **v1.0.0 已提交 Chrome Web Store 审核中，敬请期待！**
+> 
+> ⏰ 审核通过后将在此更新下载链接
 
 ### 🛠️ 方式二：开发者安装
 
@@ -99,8 +104,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/red-to-notion.git
-cd red-to-notion
+git clone https://github.com/vip-xman/Red-to-Notion.git
+cd Red-to-Notion
 
 # 安装依赖并构建
 npm install
@@ -140,7 +145,7 @@ vercel --prod
 # 或点击下方按钮快速部署
 ```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/red-to-notion)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vip-xman/Red-to-Notion)
 
 ## 📖 使用指南
 
@@ -277,7 +282,7 @@ npm run build
 我们欢迎所有形式的贡献！
 
 ### 🐛 报告Bug
-- 使用 [Issues](https://github.com/your-username/red-to-notion/issues) 报告问题
+- 使用 [Issues](https://github.com/vip-xman/Red-to-Notion/issues) 报告问题
 - 请详细描述复现步骤和环境信息
 
 ### 🚀 提交功能
@@ -286,8 +291,38 @@ npm run build
 - 提交 Pull Request 并描述改动
 
 ### 💡 建议反馈
-- 通过 [Discussions](https://github.com/your-username/red-to-notion/discussions) 分享想法
+- 通过 [Discussions](https://github.com/vip-xman/Red-to-Notion/discussions) 分享想法
 - 或直接在 Issues 中标记为 `enhancement`
+
+## 📈 版本记录
+
+### v1.0.0 (2025-09-10)
+🎉 **首个正式版本发布！**
+
+**✨ 核心功能**
+- ✅ 智能内容提取 - 支持小红书标题、正文、图片、标签完整提取
+- ✅ OAuth 2.0 认证 - 安全连接 Notion 工作区
+- ✅ 灵活页面管理 - 支持页面搜索、切换和预览
+- ✅ 现代化界面 - 采用 Notion 设计语言，响应式布局
+- ✅ Chrome Manifest V3 - 符合最新标准，安全可靠
+
+**🔧 技术特性**
+- ✅ 支持多种小红书 URL 格式
+- ✅ 智能轮播图排序和多图处理  
+- ✅ Toast 通知系统和成功页面反馈
+- ✅ 本地数据处理，隐私保护
+- ✅ Webpack 5 构建优化
+
+**📦 发布状态**
+- 🎯 已提交 Chrome Web Store 审核
+- 🌐 隐私政策页面已部署：https://red-to-notion.vercel.app/privacy
+- 📖 开源代码完全可审查
+- 🔒 通过所有安全性检查
+
+### 🔄 后续规划
+- 📸 图片本地化存储 - 直接保存图片文件到 Notion
+- 🎨 原生页面布局 - 与 Notion 官方界面保持一致  
+- 🗄️ 数据库支持 - 支持保存到 Notion 数据库，结构化管理内容
 
 ## 📄 开源协议
 
@@ -299,6 +334,8 @@ npm run build
 
 **🌟 如果这个项目对你有帮助，请给个 Star 支持一下！**
 
-Made with ❤️ by [Your Name]
+[![GitHub stars](https://img.shields.io/github/stars/vip-xman/Red-to-Notion?style=social)](https://github.com/vip-xman/Red-to-Notion/stargazers)
+
+Made with ❤️ by vip-xman
 
 </div>

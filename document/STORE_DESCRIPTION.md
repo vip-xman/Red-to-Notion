@@ -74,17 +74,24 @@ Red To Notion 是一款专为知识工作者和内容收集爱好者设计的Chr
 
 ### 🔄 更新计划
 
-我们持续改进产品体验：
-- 🆕 支持更多内容平台
-- 🎯 AI智能分类和标签
-- 🔍 高级搜索和过滤
-- 📊 使用统计和分析
+我们正在开发更强大的功能，让剪藏体验更完美：
+
+**📸 图片本地化存储**
+- 直接保存图片文件到Notion，告别链接失效烦恼
+
+**🎨 原生页面布局**
+- 支持层级结构显示，轻松找到目标页面
+- 实时同步页面状态，选择更精准
+
+**🗄️ 数据库支持**
+- 支持保存到Notion数据库，内容结构化管理
+- 智能字段映射，自动识别标题、内容、标签等
 
 ### 📞 技术支持
 
 遇到问题？我们来帮你：
-- 📧 GitHub Issues: [提交问题](https://github.com/your-username/red-to-notion/issues)
-- 📚 使用文档: [查看文档](https://github.com/your-username/red-to-notion)
+- 📧 GitHub Issues: [提交问题](https://github.com/vip-xman/Red-to-Notion/issues)
+- 📚 使用文档: [查看文档](https://github.com/vip-xman/Red-to-Notion)
 - 🔄 定期更新，修复问题和添加新功能
 
 ---
@@ -132,8 +139,8 @@ We understand the importance of privacy:
 ### 📞 Technical Support
 
 Need help? We're here for you:
-- 📧 GitHub Issues: [Submit Issues](https://github.com/your-username/red-to-notion/issues)
-- 📚 Documentation: [View Docs](https://github.com/your-username/red-to-notion)
+- 📧 GitHub Issues: [Submit Issues](https://github.com/vip-xman/Red-to-Notion/issues)
+- 📚 Documentation: [View Docs](https://github.com/vip-xman/Red-to-Notion)
 - 🔄 Regular updates with bug fixes and new features
 
 ---
