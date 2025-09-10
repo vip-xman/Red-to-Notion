@@ -9,5 +9,11 @@
     "api/notion/pages.js": {
       "runtime": "@vercel/node@3.1.5"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    }
+  ]
 }

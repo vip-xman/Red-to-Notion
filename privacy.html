@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐私政策 - Red To Notion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fafafa;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .header .last-updated {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        .nav {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .nav h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .nav ul {
+            list-style: none;
+            margin-left: 20px;
+        }
+        
+        .nav ul li {
+            margin: 5px 0;
+        }
+        
+        .nav ul li a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .nav ul li a:hover {
+            color: #2980b9;
+        }
+        
+        .section {
+            margin: 30px 0;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .section h3 {
+            color: #34495e;
+            margin: 20px 0 15px 0;
+            font-size: 1.4em;
+        }
+        
+        .section h4 {
+            color: #5a6c7d;
+            margin: 15px 0 10px 0;
+            font-size: 1.2em;
+        }
+        
+        .section p, .section li {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+        
+        .section ul, .section ol {
+            margin: 10px 0 10px 30px;
+        }
+        
+        .highlight-box {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-box {
+            background: #fdf2e8;
+            border-left: 4px solid #e67e22;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .no-collect {
+            background: #e8f5e8;
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .emoji {
+            font-style: normal;
+            margin-right: 8px;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            margin: 40px 0;
+            border-radius: 1px;
+        }
+        
+        .contact-info {
+            background: #f7f7f7;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .contact-info a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .lang-switch {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .lang-switch a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 8px 16px;
+            border: 1px solid #3498db;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .lang-switch a:hover, .lang-switch a.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .section h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>隐私政策</h1>
+            <div class="subtitle">Red To Notion Chrome 扩展</div>
+            <div class="last-updated">最后更新：2025年9月10日</div>
+        </div>
+        
+        <div class="lang-switch">
+            <a href="#chinese" class="active" onclick="showChinese()">中文</a>
+            <a href="#english" onclick="showEnglish()">English</a>
+        </div>
+
+        <div id="chinese-content">
+            <div class="nav">
+                <h3>📋 目录</h3>
+                <ul>
+                    <li><a href="#privacy-commitment">🛡️ 隐私承诺</a></li>
+                    <li><a href="#information-collection">📊 信息收集</a></li>
+                    <li><a href="#information-usage">🔄 信息使用</a></li>
+                    <li><a href="#information-protection">🔒 信息保护</a></li>
+                    <li><a href="#third-party">🤝 第三方服务</a></li>
+                    <li><a href="#your-rights">👤 您的权利</a></li>
+                    <li><a href="#policy-updates">🔄 政策更新</a></li>
+                    <li><a href="#contact">📞 联系我们</a></li>
+                </ul>
+            </div>
+
+            <div class="section" id="privacy-commitment">
+                <h2><span class="emoji">🛡️</span>隐私承诺</h2>
+                <p>我们深知您的隐私对您的重要性。本隐私政策详细说明了 Red To Notion 扩展如何收集、使用和保护您的个人信息。我们承诺以透明、安全的方式处理您的数据。</p>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="information-collection">
+                <h2><span class="emoji">📊</span>信息收集</h2>
+                
+                <h3>我们收集的信息</h3>
+                <p><strong>Red To Notion</strong> 扩展会收集以下类型的信息：</p>
+
+                <h4>1. Notion 账户信息</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>收集内容</strong>：通过 OAuth 2.0 授权获取的 Notion 访问令牌</li>
+                        <li><strong>收集目的</strong>：用于访问您的 Notion 工作区并创建页面内容</li>
+                        <li><strong>存储方式</strong>：加密存储在浏览器本地存储中</li>
+                        <li><strong>访问权限</strong>：仅限您授权的 Notion 页面</li>
+                    </ul>
+                </div>
+
+                <h4>2. 小红书内容数据</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>收集内容</strong>：您选择剪藏的小红书帖子内容（标题、正文、图片链接、标签）</li>
+                        <li><strong>收集目的</strong>：用于保存到您指定的 Notion 页面</li>
+                        <li><strong>处理方式</strong>：临时处理，不在我们的服务器上存储</li>
+                    </ul>
+                </div>
+
+                <h4>3. 使用偏好设置</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>收集内容</strong>：默认保存页面、工作区信息</li>
+                        <li><strong>收集目的</strong>：提高使用便利性，记住您的偏好设置</li>
+                        <li><strong>存储方式</strong>：本地浏览器存储</li>
+                    </ul>
+                </div>
+
+                <h3>我们不收集的信息</h3>
+                <div class="no-collect">
+                    <p>我们<strong>不会收集</strong>以下信息：</p>
+                    <ul>
+                        <li>❌ 个人身份信息（姓名、邮箱、电话等）</li>
+                        <li>❌ 浏览历史记录</li>
+                        <li>❌ 除剪藏操作外的其他网站活动</li>
+                        <li>❌ 设备指纹或唯一标识符</li>
+                        <li>❌ 地理位置信息</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="information-usage">
+                <h2><span class="emoji">🔄</span>信息使用</h2>
+                
+                <h3>数据使用目的</h3>
+                <p>我们收集的信息仅用于以下目的：</p>
+                
+                <div class="highlight-box">
+                    <h4>1. 核心功能实现</h4>
+                    <ul>
+                        <li>连接并访问您的 Notion 工作区</li>
+                        <li>提取小红书帖子内容</li>
+                        <li>将内容保存到指定的 Notion 页面</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>2. 用户体验优化</h4>
+                    <ul>
+                        <li>记住您的默认保存页面</li>
+                        <li>提供个性化的页面推荐</li>
+                        <li>优化扩展性能和稳定性</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>3. 技术支持</h4>
+                    <ul>
+                        <li>诊断和修复技术问题</li>
+                        <li>改进扩展功能和性能</li>
+                    </ul>
+                </div>
+
+                <h3>数据处理原则</h3>
+                <ul>
+                    <li><strong>最小化原则</strong>：只收集实现功能所必需的最少数据</li>
+                    <li><strong>目的限制</strong>：数据仅用于明确说明的目的</li>
+                    <li><strong>透明度</strong>：所有数据处理活动都在本政策中披露</li>
+                    <li><strong>用户控制</strong>：您可以随时撤销授权或删除数据</li>
+                </ul>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="information-protection">
+                <h2><span class="emoji">🔒</span>信息保护</h2>
+                
+                <h3>安全措施</h3>
+                <p>我们采用以下安全措施保护您的数据：</p>
+
+                <h4>技术安全</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>数据加密</strong>：访问令牌使用浏览器安全存储机制</li>
+                        <li><strong>HTTPS 传输</strong>：所有网络通信使用 HTTPS 加密</li>
+                        <li><strong>最小权限</strong>：仅请求实现功能所必需的最小权限</li>
+                        <li><strong>安全认证</strong>：使用 Notion 官方 OAuth 2.0 认证流程</li>
+                    </ul>
+                </div>
+
+                <h4>数据隔离</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>本地处理</strong>：内容提取和处理在本地完成</li>
+                        <li><strong>即时传输</strong>：数据直接从您的浏览器传输到 Notion</li>
+                        <li><strong>无中间存储</strong>：我们的服务器不存储您的个人内容</li>
+                    </ul>
+                </div>
+
+                <h3>数据保留</h3>
+                <ul>
+                    <li><strong>访问令牌</strong>：存储在浏览器中直到您手动退出登录</li>
+                    <li><strong>偏好设置</strong>：存储在浏览器中直到您清除扩展数据</li>
+                    <li><strong>临时数据</strong>：内容提取数据仅在剪藏过程中临时处理</li>
+                </ul>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="third-party">
+                <h2><span class="emoji">🤝</span>第三方服务</h2>
+                
+                <h3>Notion 集成</h3>
+                <p>我们与 Notion 集成以提供核心服务：</p>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>服务提供商</strong>：Notion Labs, Inc.</li>
+                        <li><strong>数据传输</strong>：您的剪藏内容会直接传输到 Notion</li>
+                        <li><strong>隐私政策</strong>：请查看 <a href="https://www.notion.so/Privacy-Policy-3468d120cf614d4c9014c09f6adc9091" target="_blank">Notion 隐私政策</a></li>
+                        <li><strong>用户控制</strong>：您可以随时在 Notion 中管理或删除保存的内容</li>
+                    </ul>
+                </div>
+
+                <h3>小红书内容</h3>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>数据来源</strong>：小红书公开可访问的帖子内容</li>
+                        <li><strong>处理方式</strong>：仅在您主动剪藏时提取内容</li>
+                        <li><strong>用途限制</strong>：提取的内容仅用于保存到您的个人 Notion 页面</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="your-rights">
+                <h2><span class="emoji">👤</span>您的权利</h2>
+                
+                <h3>数据控制权</h3>
+                <p>您对自己的数据拥有以下权利：</p>
+
+                <h4>访问和管理</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>查看数据</strong>：您可以在浏览器设置中查看存储的扩展数据</li>
+                        <li><strong>修改设置</strong>：随时更改默认页面和偏好设置</li>
+                        <li><strong>导出数据</strong>：所有数据都保存在您的 Notion 工作区中</li>
+                    </ul>
+                </div>
+
+                <h4>撤销和删除</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>撤销授权</strong>：在扩展中点击"退出登录"即可撤销 Notion 授权</li>
+                        <li><strong>删除扩展数据</strong>：卸载扩展会自动删除所有本地存储的数据</li>
+                        <li><strong>删除 Notion 内容</strong>：您可以直接在 Notion 中删除已保存的内容</li>
+                    </ul>
+                </div>
+
+                <h4>控制权限</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>页面权限</strong>：您可以在 Notion 中控制扩展对特定页面的访问权限</li>
+                        <li><strong>功能开关</strong>：您可以随时停用或启用扩展功能</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="policy-updates">
+                <h2><span class="emoji">🔄</span>政策更新</h2>
+                
+                <h3>更新通知</h3>
+                <ul>
+                    <li><strong>重大变更</strong>：如有重大隐私政策变更，我们会提前通知用户</li>
+                    <li><strong>通知方式</strong>：通过扩展更新说明或项目页面公告</li>
+                    <li><strong>生效时间</strong>：更新政策将在发布后立即生效</li>
+                </ul>
+
+                <h3>版本记录</h3>
+                <ul>
+                    <li><strong>v1.0</strong> (2025-09-10)：初始版本发布</li>
+                </ul>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="contact">
+                <h2><span class="emoji">📞</span>联系我们</h2>
+                <div class="contact-info">
+                    <p>如果您对本隐私政策有任何疑问或建议，请通过以下方式联系我们：</p>
+                    <ul>
+                        <li><strong>GitHub Issues</strong>：<a href="https://github.com/vip-xman/Red-to-Notion/issues" target="_blank">Red To Notion Issues</a></li>
+                        <li><strong>项目页面</strong>：<a href="https://github.com/vip-xman/Red-to-Notion" target="_blank">GitHub Repository</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2><span class="emoji">🌏</span>适用范围</h2>
+                <p>本隐私政策适用于：</p>
+                <ul>
+                    <li>Red To Notion Chrome 扩展的所有版本</li>
+                    <li>扩展的所有功能和服务</li>
+                    <li>全球所有用户</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2><span class="emoji">✅</span>合规声明</h2>
+                <p>本扩展遵守以下法规和标准：</p>
+                <ul>
+                    <li>Chrome Web Store 开发者政策</li>
+                    <li>Google API 服务条款</li>
+                    <li>Notion API 使用条款</li>
+                    <li>适用的数据保护法律法规</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="english-content" style="display: none;">
+            <div class="nav">
+                <h3>📋 Table of Contents</h3>
+                <ul>
+                    <li><a href="#privacy-commitment-en">🛡️ Our Commitment to Privacy</a></li>
+                    <li><a href="#information-collection-en">📊 Information We Collect</a></li>
+                    <li><a href="#information-usage-en">🔄 How We Use Information</a></li>
+                    <li><a href="#information-protection-en">🔒 Information Protection</a></li>
+                    <li><a href="#third-party-en">🤝 Third-Party Services</a></li>
+                    <li><a href="#your-rights-en">👤 Your Rights</a></li>
+                    <li><a href="#contact-en">📞 Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="section" id="privacy-commitment-en">
+                <h2><span class="emoji">🛡️</span>Our Commitment to Privacy</h2>
+                <p>Your privacy is important to us. This Privacy Policy explains how the Red To Notion extension collects, uses, and protects your personal information. We are committed to handling your data transparently and securely.</p>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="information-collection-en">
+                <h2><span class="emoji">📊</span>Information We Collect</h2>
+                
+                <h3>What We Collect</h3>
+                <p>The <strong>Red To Notion</strong> extension collects the following types of information:</p>
+
+                <h4>1. Notion Account Information</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>What</strong>: Notion access tokens obtained through OAuth 2.0 authorization</li>
+                        <li><strong>Purpose</strong>: To access your Notion workspace and create page content</li>
+                        <li><strong>Storage</strong>: Encrypted and stored in your browser's local storage</li>
+                        <li><strong>Scope</strong>: Only the Notion pages you authorize</li>
+                    </ul>
+                </div>
+
+                <h4>2. Xiaohongshu Content Data</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>What</strong>: Content from Xiaohongshu posts you choose to clip (titles, text, image links, tags)</li>
+                        <li><strong>Purpose</strong>: To save to your specified Notion pages</li>
+                        <li><strong>Processing</strong>: Temporary processing only, not stored on our servers</li>
+                    </ul>
+                </div>
+
+                <h4>3. User Preferences</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>What</strong>: Default save pages, workspace information</li>
+                        <li><strong>Purpose</strong>: To improve usability and remember your settings</li>
+                        <li><strong>Storage</strong>: Local browser storage</li>
+                    </ul>
+                </div>
+
+                <h3>What We Don't Collect</h3>
+                <div class="no-collect">
+                    <p>We <strong>do NOT</strong> collect:</p>
+                    <ul>
+                        <li>❌ Personal identification information (names, emails, phone numbers)</li>
+                        <li>❌ Browsing history</li>
+                        <li>❌ Website activities other than clipping operations</li>
+                        <li>❌ Device fingerprints or unique identifiers</li>
+                        <li>❌ Location information</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="information-usage-en">
+                <h2><span class="emoji">🔄</span>How We Use Information</h2>
+                
+                <h3>Purposes of Data Use</h3>
+                <p>We use collected information solely for:</p>
+                
+                <div class="highlight-box">
+                    <h4>1. Core Functionality</h4>
+                    <ul>
+                        <li>Connecting to and accessing your Notion workspace</li>
+                        <li>Extracting Xiaohongshu post content</li>
+                        <li>Saving content to specified Notion pages</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>2. User Experience</h4>
+                    <ul>
+                        <li>Remembering your default save pages</li>
+                        <li>Providing personalized page recommendations</li>
+                        <li>Optimizing extension performance</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>3. Technical Support</h4>
+                    <ul>
+                        <li>Diagnosing and fixing technical issues</li>
+                        <li>Improving extension features and performance</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="information-protection-en">
+                <h2><span class="emoji">🔒</span>Information Protection</h2>
+                
+                <h3>Security Measures</h3>
+                <p>We implement the following security measures:</p>
+
+                <h4>Technical Security</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>Data Encryption</strong>: Access tokens secured using browser security mechanisms</li>
+                        <li><strong>HTTPS Transport</strong>: All communications encrypted with HTTPS</li>
+                        <li><strong>Minimal Permissions</strong>: Only requesting minimum necessary permissions</li>
+                        <li><strong>Secure Authentication</strong>: Using official Notion OAuth 2.0 flow</li>
+                    </ul>
+                </div>
+
+                <h4>Data Isolation</h4>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>Local Processing</strong>: Content extraction processed locally</li>
+                        <li><strong>Direct Transfer</strong>: Data transfers directly from your browser to Notion</li>
+                        <li><strong>No Intermediate Storage</strong>: Our servers do not store your personal content</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="third-party-en">
+                <h2><span class="emoji">🤝</span>Third-Party Services</h2>
+                
+                <h3>Notion Integration</h3>
+                <p>We integrate with Notion to provide core services:</p>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>Provider</strong>: Notion Labs, Inc.</li>
+                        <li><strong>Data Transfer</strong>: Your clipped content transfers directly to Notion</li>
+                        <li><strong>Privacy Policy</strong>: See <a href="https://www.notion.so/Privacy-Policy-3468d120cf614d4c9014c09f6adc9091" target="_blank">Notion Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="your-rights-en">
+                <h2><span class="emoji">👤</span>Your Rights</h2>
+                
+                <p>You have the following rights regarding your data:</p>
+
+                <h3>Access and Management</h3>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>View Data</strong>: Check stored extension data in browser settings</li>
+                        <li><strong>Modify Settings</strong>: Change default pages and preferences anytime</li>
+                        <li><strong>Export Data</strong>: All data saved in your Notion workspace</li>
+                    </ul>
+                </div>
+
+                <h3>Revocation and Deletion</h3>
+                <div class="highlight-box">
+                    <ul>
+                        <li><strong>Revoke Authorization</strong>: Click "Logout" in extension to revoke Notion access</li>
+                        <li><strong>Delete Extension Data</strong>: Uninstalling removes all locally stored data</li>
+                        <li><strong>Delete Notion Content</strong>: Delete saved content directly in Notion</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section" id="contact-en">
+                <h2><span class="emoji">📞</span>Contact Us</h2>
+                <div class="contact-info">
+                    <p>For questions about this Privacy Policy, please contact us:</p>
+                    <ul>
+                        <li><strong>GitHub Issues</strong>: <a href="https://github.com/vip-xman/Red-to-Notion/issues" target="_blank">Red To Notion Issues</a></li>
+                        <li><strong>Project Page</strong>: <a href="https://github.com/vip-xman/Red-to-Notion" target="_blank">GitHub Repository</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><em>本隐私政策以中文和英文提供。如有冲突，以中文版本为准。</em></p>
+            <p><em>This Privacy Policy is provided in both Chinese and English. In case of conflicts, the Chinese version shall prevail.</em></p>
+        </div>
+    </div>
+
+    <script>
+        function showChinese() {
+            document.getElementById('chinese-content').style.display = 'block';
+            document.getElementById('english-content').style.display = 'none';
+            document.querySelector('.lang-switch a[onclick="showChinese()"]').classList.add('active');
+            document.querySelector('.lang-switch a[onclick="showEnglish()"]').classList.remove('active');
+        }
+        
+        function showEnglish() {
+            document.getElementById('chinese-content').style.display = 'none';
+            document.getElementById('english-content').style.display = 'block';
+            document.querySelector('.lang-switch a[onclick="showEnglish()"]').classList.add('active');
+            document.querySelector('.lang-switch a[onclick="showChinese()"]').classList.remove('active');
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

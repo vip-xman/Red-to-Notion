@@ -47,3 +47,11 @@ store/
 
 # 额外图片文件
 images/柯基.png
+
+# 构建和发布文件
+build-release.sh
+CHROME_WEB_STORE_GUIDE.md
+LICENSE
+
+# 临时和辅助文件  
+create_icon.html
