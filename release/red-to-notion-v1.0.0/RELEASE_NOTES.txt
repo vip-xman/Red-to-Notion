@@ -1,0 +1,16 @@
+Red To Notion v1.0.0 - Chrome Web Store Release
+
+📋 发布内容 Release Contents:
+- ✅ 核心扩展功能 Core extension functionality
+- ✅ 现代化 UI 设计 Modern UI design  
+- ✅ Notion OAuth 集成 Notion OAuth integration
+- ✅ 小红书内容提取 Xiaohongshu content extraction
+- ✅ 隐私政策 Privacy policy compliance
+- ✅ 开源许可证 MIT License
+
+🛡️ 隐私政策 Privacy Policy:
+详见 GitHub 项目页面: https://github.com/your-username/red-to-notion
+
+📞 技术支持 Support:
+GitHub Issues: https://github.com/your-username/red-to-notion/issues
+
