@@ -17,6 +17,18 @@
 - `dist/background.js` - 压缩后的后台脚本
 - `dist/popup.js` - 压缩后的弹窗脚本
 
+### 重要变更提醒 ⚠️
+
+**manifest.json 路径配置已优化**：
+- ✅ `background.service_worker`: 现在指向 `background.js`（根目录）
+- ✅ `content_scripts.js`: 现在指向 `content.js`（根目录）  
+- ✅ 发布包结构：编译文件直接放在根目录，简化路径结构
+
+**构建流程说明**：
+1. webpack 将源文件编译到 `dist/` 目录
+2. `build-release.sh` 将 `dist/` 中的文件复制到发布包根目录
+3. manifest.json 配置指向发布包根目录的文件
+
 ### 开发流程
 
 1. **修改源文件**：编辑根目录下的 `.js` 和 `.html` 文件
@@ -46,8 +58,68 @@ npm run build
 2. **弹窗脚本调试**：右键点击扩展图标 → "检查" → Console
 3. **后台脚本调试**：在 `chrome://extensions/` 点击扩展的"service worker"
 
-## 最近更新
+## 最近重要更新
 
+### v1.0.2 (2025-09-14) - Chrome Web Store 违规修复
+- 🔧 修复 background script 路径配置问题
+- 🔧 解决发布包文件路径与 manifest.json 不匹配的问题
+- 📦 优化扩展文件结构，提高兼容性
+
+### v1.0.1 (2025-09-14) - 权限优化
+- 🔒 移除未使用的 scripting 和 identity 权限
+- 🔒 符合 Chrome Web Store 最小权限原则
+- ✅ 通过权限违规审核要求
+
+### 早期更新
 - 修复了标题提取的跨帖子污染问题
-- 改进了内容预览的显示逻辑
+- 改进了内容预览的显示逻辑  
 - 移除了展开按钮，简化了用户界面
+
+## 故障排除
+
+### Chrome Web Store 发布问题
+如果遇到发布被拒的情况：
+
+1. **权限违规**：确保 manifest.json 中只包含实际使用的权限
+   - 检查 `permissions` 数组，移除未使用的权限
+   - 参考当前配置：`["activeTab", "storage", "tabs"]`
+
+2. **脚本加载失败**：检查 manifest.json 中的文件路径与实际文件位置是否匹配
+   - `background.service_worker` 应指向根目录的 `background.js`
+   - `content_scripts.js` 应指向根目录的 `content.js`
+
+3. **文件结构**：使用 `./build-release.sh` 确保发布包结构正确
+   - 编译文件应在发布包根目录
+   - manifest.json 配置路径应与实际文件位置一致
+
+### 本地开发问题
+
+1. **扩展无法加载**：
+   - 检查 manifest.json 语法是否正确
+   - 确保所有引用的文件都存在
+
+2. **功能异常**：
+   - 运行 `npm run build` 重新构建后重新加载扩展
+   - 检查浏览器控制台是否有错误信息
+
+3. **OAuth 认证失败**：
+   - 确认 Notion 集成配置正确
+   - 检查重定向 URI 设置
+
+### 调试步骤
+
+1. **检查构建状态**：
+   ```bash
+   npm run build
+   # 确保 dist/ 目录包含所有编译文件
+   ```
+
+2. **验证发布包**：
+   ```bash
+   ./build-release.sh
+   # 检查生成的 zip 文件结构
+   ```
+
+3. **测试本地安装**：
+   - 在 `chrome://extensions/` 加载解压的扩展程序
+   - 测试所有功能是否正常工作

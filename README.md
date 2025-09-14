@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Red To Notion](https://img.shields.io/badge/Red%20To%20Notion-v1.0.0-orange)
+![Red To Notion](https://img.shields.io/badge/Red%20To%20Notion-v1.0.2-orange)
 ![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-green)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue)
 ![Notion API](https://img.shields.io/badge/Notion-API-black)
@@ -10,7 +10,7 @@
 
 *将小红书精彩内容一键保存到你的 Notion 工作区* ✨
 
-**🎉 v1.0.0 正式版已发布！Chrome Web Store 审核中...**
+**🎉 v1.0.2 技术问题已修复！准备重新提交 Chrome Web Store 审核**
 
 </div>
 
@@ -94,9 +94,9 @@
 
 ### 📦 方式一：Chrome Web Store 安装 (推荐)
 
-> 🎯 **v1.0.0 已提交 Chrome Web Store 审核中，敬请期待！**
+> 🎯 **v1.0.2 技术违规问题已修复，准备重新提交审核**
 > 
-> ⏰ 审核通过后将在此更新下载链接
+> ⏰ 已解决权限配置和脚本路径问题，等待重新提交后审核通过
 
 ### 🛠️ 方式二：开发者安装
 
@@ -295,6 +295,29 @@ npm run build
 - 或直接在 Issues 中标记为 `enhancement`
 
 ## 📈 版本记录
+
+### v1.0.2 (2025-09-14)
+🛠️ **Chrome Web Store 违规问题修复**
+
+**🔧 修复内容**
+- ✅ 修复 background script 路径配置错误
+- ✅ 优化 manifest.json 文件路径结构  
+- ✅ 解决 "Could not load background script" 错误
+- ✅ 确保发布包文件路径与配置完全匹配
+
+**📦 技术改进**
+- ✅ 简化扩展文件结构，提高加载性能
+- ✅ 优化构建流程，确保路径一致性
+- ✅ 通过 Chrome Web Store 政策合规检查
+
+### v1.0.1 (2025-09-14)
+🔒 **权限优化版本**
+
+**🔧 修复内容**
+- ✅ 移除未使用的 `scripting` 权限
+- ✅ 移除未使用的 `identity` 权限
+- ✅ 符合 Chrome Web Store 最小权限原则
+- ✅ 通过权限违规审核要求
 
 ### v1.0.0 (2025-09-10)
 🎉 **首个正式版本发布！**

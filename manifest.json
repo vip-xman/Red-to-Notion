@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Red To Notion",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "将小红书精彩内容一键保存到 Notion | Clip Xiaohongshu posts to Notion with one click",
   "short_name": "RedToNotion",
   "author": "Red To Notion Team",
@@ -15,8 +15,6 @@
   "permissions": [
     "activeTab",
     "storage",
-    "scripting",
-    "identity",
     "tabs"
   ],
   "optional_permissions": [],
@@ -38,12 +36,12 @@
   "content_scripts": [
     {
       "matches": ["https://www.xiaohongshu.com/*"],
-      "js": ["dist/content.js"],
+      "js": ["content.js"],
       "run_at": "document_idle"
     }
   ],
   "background": {
-    "service_worker": "dist/background.js"
+    "service_worker": "background.js"
   },
   "web_accessible_resources": [
     {

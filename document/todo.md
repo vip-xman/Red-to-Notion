@@ -308,3 +308,21 @@ https://www.xiaohongshu.com/explore/66128b20000000000401be91?xsec_token=ABVwupKc
 - [ ] 支持设置和使用默认剪藏页面
 - [ ] 完全移除手动Token配置方式
 - [ ] 整体操作流程顺畅，符合用户直觉
+
+
+#todo任务
+## 【✅】处理上架申请的违规问题
+很好，这个违规问题处理完了，我们来解决下一个违规问题：
+违规行为的类型：垃圾内容和商店中的排名
+详情：	
+* 违规行为参考 ID： Yellow Magnesium
+* 违规行为： 未提供所承诺的功能  "Could not load background script 'dist/background.js'"
+* 如何纠正： 请在本地测试您向应用商店提交的代码，确保您提交的内容在正确的路径下包含正确的文件，并且按预期运行。有关详情，请参阅与 Manifest V3 版本相关的文档（https://developer.chrome.com/docs/extensions/develop/migrate?hl=zh-cn）和迁移核对清单（https://developer.chrome.com/docs/extensions/develop/migrate/checklist?hl=zh-cn）。
+* 计划政策的相关部分： 禁止发布包含已损坏功能（例如废弃的网站或不能正常运行的功能）的扩展程序。
+
+
+## 填写版本更新说明：
+v1.0.1  修复权限违规问题，移除未使用的权限
+v1.0.2  修复内容: 脚本路径配置错误
+
+## 更新development.md文档和readme.md
