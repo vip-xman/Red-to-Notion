@@ -7,3 +7,8 @@ dist/
 
 # 对话记录文件
 conversation-*.txt
+
+# 本地todo文件
+document/todo.md
+**/todo.md
+todo.txt
