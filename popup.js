@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showContentPreview(null);
         updateClipButton();
         if (AppState.isLoggedIn) {
-          showStatus('请在小红书页面使用此工具', 'info');
+          showStatus('💡 请先打开小红书页面，然后使用此扩展', 'info');
         }
         return;
       }

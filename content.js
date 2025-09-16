@@ -28,7 +28,7 @@ function extractXiaohongshuContent() {
                            url.match(/xiaohongshu\.com\/\w+\/\w+/);
   
   if (!isXiaohongshuPost) {
-    throw new Error('当前页面不是小红书帖子页面，URL: ' + url);
+    throw new Error('请打开一个图文帖，再使用扩展');
   }
   
   console.log('Is detail page:', isDetailPage);
