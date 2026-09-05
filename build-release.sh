@@ -8,7 +8,7 @@ echo "Building Chrome Web Store release package..."
 
 # 设置变量
 RELEASE_DIR="release"
-PACKAGE_NAME="red-to-notion-v1.0.2"
+PACKAGE_NAME="red-to-notion-v1.1.0"
 
 # 清理旧的发布目录
 echo "🧹 清理旧的发布目录..."

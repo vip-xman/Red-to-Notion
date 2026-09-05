@@ -50,6 +50,16 @@ function extractXiaohongshuContent() {
     throw new Error('未能提取到帖子内容');
   }
 
+  // 有些渠道（如document.title兜底）会把正文本身当标题返回，
+  // 这种情况和"没有标题"本质一样，都需要改用正文开头几个字
+  const isTitleActuallyContent = data.title && data.content &&
+    (data.content.startsWith(data.title) || data.title.startsWith(data.content));
+
+  if ((!data.title || isTitleActuallyContent) && data.content) {
+    const firstLine = data.content.split('\n')[0].trim();
+    data.title = firstLine.length > 10 ? firstLine.substring(0, 10) + '...' : firstLine;
+  }
+
   return data;
 }
 
@@ -87,12 +97,13 @@ function extractTitle() {
     '[class*="title"]'     // 包含title的class
   ];
 
-  // 需要过滤的UI文本
+  // 需要过滤的UI文本（这些是页面上固定的推荐模块/面板标题，不是帖子标题）
   const uiFilters = [
     '温馨提示', '提示', '小红书', 'Xiaohongshu',
     '登录', '注册', '关注', '点赞', '评论', '分享', '收藏',
-    '更多', '查看更多', '展开', '收起', 
-    'App', '下载', '立即下载', '打开App', '去App查看'
+    '更多', '查看更多', '展开', '收起',
+    'App', '下载', '立即下载', '打开App', '去App查看',
+    '猜你想搜', '活动'
   ];
 
   console.log('开始遍历选择器...');
@@ -126,15 +137,21 @@ function extractTitle() {
       }
       
       // 检查是否来自其他帖子
-      const isFromFeedItem = element.closest('.note-item') && 
-                           !element.closest('.note-detail') && 
+      const isFromFeedItem = element.closest('.note-item') &&
+                           !element.closest('.note-detail') &&
                            !element.closest('.note-detail-mask');
-      
+
       if (isFromFeedItem) {
         console.log('  → 跳过: 来自feed列表中的其他帖子');
         continue;
       }
-      
+
+      // "猜你想搜"等推荐胶囊组件会插在正文里，内容随笔记变化，无法靠文本黑名单过滤，只能按容器排除
+      if (element.closest('[class*="xhs-capsule-widget"]')) {
+        console.log('  → 跳过: 来自猜你想搜等推荐胶囊组件');
+        continue;
+      }
+
       console.log(`  ✓ 找到有效标题: "${text}"`);
       console.log('=== 标题提取完成 ===');
       return text;
@@ -219,99 +236,32 @@ function extractContent() {
 
 function extractImages() {
   const images = [];
-  
-  // 专注于note-slider-img，这是最准确的选择器
-  const sliderImgs = document.querySelectorAll('.note-slider-img');
-  
-  if (sliderImgs.length > 0) {
-    // 先收集所有图片信息
-    const imageInfos = [];
-    
-    sliderImgs.forEach((img, index) => {
-      const rect = img.getBoundingClientRect();
-      const src = processImageSrc(img);
-      
-      if (src) {
-        imageInfos.push({
-          index: index,
-          element: img,
-          src: src,
-          position: {
-            left: rect.left,
-            top: rect.top
-          },
-          visible: rect.width > 0 && rect.height > 0,
-          // 尝试获取更多位置信息
-          offsetLeft: img.offsetLeft,
-          offsetTop: img.offsetTop,
-          // 检查父元素的data属性，可能包含顺序信息
-          parentData: {
-            index: img.parentElement?.getAttribute('data-index'),
-            swiper: img.parentElement?.getAttribute('data-swiper-slide-index'),
-            slide: img.closest('[data-slide-index]')?.getAttribute('data-slide-index')
-          }
-        });
-      }
-    });
-    
-    // 尝试多种排序策略
-    const domOrder = [...imageInfos];
-    
-    // 按水平位置排序（左到右）
-    const positionOrder = [...imageInfos].sort((a, b) => {
-      const aLeft = a.position.left;
-      const bLeft = b.position.left;
-      
-      // 首先按垂直位置分组
-      if (Math.abs(a.position.top - b.position.top) > 50) {
-        return a.position.top - b.position.top;
-      }
-      
-      // 对于轮播图，处理循环显示的情况
-      const threshold = -200;
-      
-      if (aLeft < threshold && bLeft > threshold) {
-        return 1;
-      }
-      if (bLeft < threshold && aLeft > threshold) {
-        return -1;
-      }
-      
-      return aLeft - bLeft;
-    });
-    
-    // 按swiper-slide-index排序（如果存在）
-    const swiperOrder = [...imageInfos].sort((a, b) => {
-      const aIndex = parseInt(a.parentData.swiper) || parseInt(a.parentData.slide) || parseInt(a.parentData.index) || a.index;
-      const bIndex = parseInt(b.parentData.swiper) || parseInt(b.parentData.slide) || parseInt(b.parentData.index) || b.index;
-      return aIndex - bIndex;
-    });
-    
-    // 调整DOM顺序（第一个移到最后）
-    const adjustedDomOrder = [...imageInfos];
-    if (adjustedDomOrder.length > 1) {
-      const first = adjustedDomOrder.shift();
-      adjustedDomOrder.push(first);
-    }
 
-    // 选择最佳排序策略
-    let finalOrder;
-    if (swiperOrder.some(info => info.parentData.swiper || info.parentData.slide)) {
-      finalOrder = swiperOrder;
-    } else {
-      finalOrder = adjustedDomOrder;
-    }
-    
-    // 去重并添加到结果数组
-    const processedUrls = [];
-    finalOrder.forEach((info) => {
-      if (!processedUrls.includes(info.src)) {
+  // 小红书轮播用Swiper实现，loop模式下DOM里会克隆首尾slide用于无缝循环，
+  // 真实顺序由.swiper-slide上的data-swiper-slide-index决定，不能依赖DOM顺序
+  const slides = document.querySelectorAll('.swiper-slide[data-swiper-slide-index]');
+
+  if (slides.length > 0) {
+    const slideInfos = Array.from(slides).map(slide => {
+      const innerImg = slide.querySelector('img');
+      return {
+        slideIndex: parseInt(slide.getAttribute('data-swiper-slide-index'), 10),
+        src: innerImg ? processImageSrc(innerImg) : null
+      };
+    }).filter(info => info.src && !Number.isNaN(info.slideIndex));
+
+    slideInfos.sort((a, b) => a.slideIndex - b.slideIndex);
+
+    const seenIndexes = new Set();
+    slideInfos.forEach(info => {
+      // loop模式下同一张图会被克隆出重复的slideIndex，去重
+      if (!seenIndexes.has(info.slideIndex)) {
         images.push(info.src);
-        processedUrls.push(info.src);
+        seenIndexes.add(info.slideIndex);
       }
     });
   }
-  
+
   // 如果没有找到slider图片，尝试备用方案
   if (images.length === 0) {
     const backupSelectors = [

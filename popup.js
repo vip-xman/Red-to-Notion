@@ -3,8 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const AppState = {
     isLoggedIn: false,
     currentPageData: null,
-    currentPage: null,
-    allPages: [],
+    currentTarget: null, // { id, title, icon, url, type: 'page' | 'database' }
+    workspaceNodes: [], // 扁平节点列表，带parentId/parentType，用于客户端拼装层级树
+    expandedIds: new Set(), // 已展开的树节点id
     accessToken: null,
     workspace: null,
     currentView: 'welcome' // welcome, main, success
@@ -48,12 +49,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Drawer
     pageDrawer: document.getElementById('pageDrawer'),
     drawerBackBtn: document.getElementById('drawerBackBtn'),
-    pageSearchInput: document.getElementById('pageSearchInput'),
     allPagesList: document.getElementById('allPagesList'),
     pagesLoading: document.getElementById('pagesLoading'),
     pagesEmpty: document.getElementById('pagesEmpty'),
-    createPageBtn: document.getElementById('createPageBtn'),
-    
+
     // Toast
     toastContainer: document.getElementById('toastContainer')
   };
@@ -89,9 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (e.target === elements.pageDrawer) closePageDrawer();
     });
     
-    elements.pageSearchInput.addEventListener('input', debounce(handlePageSearch, 300));
-    elements.createPageBtn.addEventListener('click', handleCreatePage);
-
     // Storage changes
     chrome.storage.onChanged.addListener((changes) => {
       if (changes.oauthToken || changes.authMethod) {
@@ -103,8 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Authentication
   async function checkAuthStatus() {
     try {
-      const result = await chrome.storage.sync.get(['oauthToken', 'workspaceName', 'workspaceIcon', 'authMethod', 'defaultPageId', 'managedPages']);
-      
+      const result = await chrome.storage.sync.get([
+        'oauthToken', 'workspaceName', 'workspaceIcon', 'authMethod',
+        'defaultTarget',
+        'defaultTargetId', 'defaultTargetType', 'defaultPageId' // 旧版本字段，用于迁移
+      ]);
+
       if (result.oauthToken && result.authMethod === 'oauth') {
         AppState.isLoggedIn = true;
         AppState.accessToken = result.oauthToken;
@@ -112,11 +112,18 @@ document.addEventListener('DOMContentLoaded', function() {
           name: result.workspaceName,
           icon: result.workspaceIcon
         };
-        
-        // Load managed pages
-        AppState.allPages = result.managedPages || [];
-        AppState.currentPage = AppState.allPages.find(p => p.id === result.defaultPageId) || null;
-        
+
+        if (result.defaultTarget) {
+          AppState.currentTarget = result.defaultTarget;
+        } else {
+          // 兼容旧版本：只存了id/type（或更早的defaultPageId），用占位信息展示，抽屉里会实时补全
+          const targetId = result.defaultTargetId || result.defaultPageId;
+          const targetType = result.defaultTargetType || (result.defaultPageId ? 'page' : null);
+          AppState.currentTarget = targetId
+            ? { id: targetId, type: targetType || 'page', title: targetType === 'database' ? '已选数据库' : '已选页面', icon: targetType === 'database' ? '🗂️' : '📄' }
+            : null;
+        }
+
         updateHeaderForLoggedIn();
         switchToMainView();
         updatePageSelector();
@@ -176,8 +183,9 @@ document.addEventListener('DOMContentLoaded', function() {
     AppState.isLoggedIn = false;
     AppState.accessToken = null;
     AppState.workspace = null;
-    AppState.currentPage = null;
-    AppState.allPages = [];
+    AppState.currentTarget = null;
+    AppState.workspaceNodes = [];
+    AppState.expandedIds = new Set();
     switchToWelcomeView();
     elements.headerActions.innerHTML = '';
     showStatus('已退出登录', 'info');
@@ -319,25 +327,26 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.contentPreview.style.display = 'block';
   }
 
-  // Page selection
+  // Target(页面/数据库) selection
   function updatePageSelector() {
-    if (AppState.currentPage) {
-      elements.currentPageIcon.textContent = AppState.currentPage.icon || '📄';
-      elements.currentPageTitle.textContent = AppState.currentPage.title.length > 12 ? AppState.currentPage.title.substring(0, 12) + '...' : AppState.currentPage.title;
+    if (AppState.currentTarget) {
+      const typeLabel = AppState.currentTarget.type === 'database' ? '🗂️' : (AppState.currentTarget.icon || '📄');
+      elements.currentPageIcon.textContent = typeLabel;
+      elements.currentPageTitle.textContent = AppState.currentTarget.title.length > 12 ? AppState.currentTarget.title.substring(0, 12) + '...' : AppState.currentTarget.title;
     } else {
       elements.currentPageIcon.textContent = '📄';
-      elements.currentPageTitle.textContent = '选择页面';
+      elements.currentPageTitle.textContent = '选择保存位置';
     }
   }
 
   function updateClipButton() {
-    const canClip = AppState.isLoggedIn && AppState.currentPageData && AppState.currentPage;
+    const canClip = AppState.isLoggedIn && AppState.currentPageData && AppState.currentTarget;
     elements.clipBtn.disabled = !canClip;
-    
+
     if (!AppState.isLoggedIn) {
       elements.clipBtn.innerHTML = '<span>📎</span><span>请先连接 Notion</span>';
-    } else if (!AppState.currentPage) {
-      elements.clipBtn.innerHTML = '<span>📎</span><span>请先选择页面</span>';
+    } else if (!AppState.currentTarget) {
+      elements.clipBtn.innerHTML = '<span>📎</span><span>请先选择保存位置</span>';
     } else if (!AppState.currentPageData) {
       elements.clipBtn.innerHTML = '<span>📎</span><span>请在小红书页面使用</span>';
     } else {
@@ -345,118 +354,154 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Drawer management
+  // Drawer management：树形结构展示Notion工作区里已授权的页面/数据库，与真实层级同步
   function openPageDrawer() {
     elements.pageDrawer.classList.remove('hidden');
-    loadAvailablePages();
-    elements.pageSearchInput.focus();
+    loadWorkspaceTree();
   }
 
   function closePageDrawer() {
     elements.pageDrawer.classList.add('hidden');
-    elements.pageSearchInput.value = '';
   }
 
-  async function loadAvailablePages(query = '') {
+  async function loadWorkspaceTree() {
     if (!AppState.accessToken) return;
 
-    // Show loading
     elements.pagesLoading.classList.remove('hidden');
     elements.pagesEmpty.classList.add('hidden');
+    elements.allPagesList.innerHTML = '';
 
     try {
       const response = await chrome.runtime.sendMessage({
-        action: 'getNotionPages',
-        accessToken: AppState.accessToken,
-        query: query
+        action: 'getWorkspaceTree',
+        accessToken: AppState.accessToken
       });
 
       if (response.success) {
-        AppState.allPages = response.pages;
-        renderPageLists();
+        AppState.workspaceNodes = response.nodes;
+        renderWorkspaceTree();
       } else {
-        showEmptyPages();
+        showEmptyWorkspace();
         showToast('加载失败', response.error, 'error');
       }
     } catch (error) {
-      showEmptyPages();
+      showEmptyWorkspace();
       showToast('加载失败', error.message, 'error');
     } finally {
       elements.pagesLoading.classList.add('hidden');
     }
   }
 
-  function renderPageLists() {
-    // Render all pages
-    renderPageList(elements.allPagesList, AppState.allPages);
-  }
-
-  function renderPageList(container, pages) {
+  function renderWorkspaceTree() {
+    const container = elements.allPagesList;
     container.innerHTML = '';
-    
-    if (pages.length === 0) {
-      showEmptyPages();
+
+    if (AppState.workspaceNodes.length === 0) {
+      showEmptyWorkspace();
       return;
     }
 
-    pages.forEach(page => {
-      const pageItem = document.createElement('div');
-      pageItem.className = `page-item ${AppState.currentPage?.id === page.id ? 'selected' : ''}`;
-      
-      pageItem.innerHTML = `
-        <div class="page-item-info">
-          <div class="page-item-title">
-            <span>${page.icon || '📄'}</span>
-            <span>${page.title.length > 12 ? page.title.substring(0, 12) + '...' : page.title}</span>
-          </div>
-          <div class="page-item-meta">更新于 ${getRelativeTime(page.last_edited_time)}</div>
-        </div>
-        <div class="page-item-action">
-          ${AppState.currentPage?.id === page.id 
-            ? '<span class="page-badge">默认</span>' 
-            : '<span class="page-badge secondary">切换</span>'
-          }
-        </div>
-      `;
-      
-      pageItem.addEventListener('click', () => selectPage(page));
-      container.appendChild(pageItem);
+    const nodeById = new Map(AppState.workspaceNodes.map(n => [n.id, n]));
+    const childrenByParent = new Map();
+    AppState.workspaceNodes.forEach(node => {
+      // parentId不存在于当前集合里的（工作区顶层，或父节点不可见），都当作根节点
+      const key = node.parentType === 'workspace' || !nodeById.has(node.parentId) ? 'root' : node.parentId;
+      if (!childrenByParent.has(key)) childrenByParent.set(key, []);
+      childrenByParent.get(key).push(node);
     });
+
+    const roots = childrenByParent.get('root') || [];
+    if (roots.length === 0) {
+      showEmptyWorkspace();
+      return;
+    }
+
+    const renderLevel = (nodes, depth) => {
+      nodes.forEach(node => {
+        const children = childrenByParent.get(node.id) || [];
+        container.appendChild(renderTreeItem(node, depth, children.length > 0));
+        if (children.length > 0 && AppState.expandedIds.has(node.id)) {
+          renderLevel(children, depth + 1);
+        }
+      });
+    };
+
+    renderLevel(roots, 0);
   }
 
-  function showEmptyPages() {
+  function renderTreeItem(node, depth, hasChildren = false) {
+    const item = document.createElement('div');
+    const isSelected = AppState.currentTarget?.type === node.type && AppState.currentTarget?.id === node.id;
+    const isExpanded = AppState.expandedIds.has(node.id);
+    item.className = `page-item ${isSelected ? 'selected' : ''}`;
+    item.style.paddingLeft = `${12 + depth * 20}px`;
+
+    const defaultIcon = node.type === 'database' ? '🗂️' : '📄';
+    const toggleHtml = hasChildren
+      ? `<span class="tree-toggle" data-expanded="${isExpanded}">${isExpanded ? '▾' : '▸'}</span>`
+      : `<span class="tree-toggle-spacer"></span>`;
+
+    item.innerHTML = `
+      <div class="page-item-info">
+        <div class="page-item-title">
+          ${toggleHtml}
+          <span>${node.icon || defaultIcon}</span>
+          <span>${node.title.length > 16 ? node.title.substring(0, 16) + '...' : node.title}</span>
+        </div>
+      </div>
+      <div class="page-item-action">
+        ${isSelected
+          ? '<span class="page-badge">默认</span>'
+          : '<span class="page-badge secondary">切换</span>'
+        }
+      </div>
+    `;
+
+    if (hasChildren) {
+      const toggle = item.querySelector('.tree-toggle');
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (AppState.expandedIds.has(node.id)) {
+          AppState.expandedIds.delete(node.id);
+        } else {
+          AppState.expandedIds.add(node.id);
+        }
+        renderWorkspaceTree();
+      });
+    }
+
+    item.addEventListener('click', () => selectTarget(node));
+    return item;
+  }
+
+  function showEmptyWorkspace() {
     elements.allPagesList.innerHTML = '';
     elements.pagesEmpty.classList.remove('hidden');
   }
 
-  async function selectPage(page) {
-    AppState.currentPage = page;
-    
-    // Save to storage
+  async function selectTarget(target) {
+    AppState.currentTarget = target;
+
     await chrome.storage.sync.set({
-      defaultPageId: page.id,
-      managedPages: AppState.allPages
+      defaultTarget: {
+        id: target.id,
+        type: target.type,
+        title: target.title,
+        icon: target.icon,
+        url: target.url
+      }
     });
-    
+
     updatePageSelector();
     updateClipButton();
     closePageDrawer();
-    
-    showToast('设置成功', `默认保存到「${page.title.length > 10 ? page.title.substring(0, 10) + '...' : page.title}」`, 'success', 2000);
-  }
 
-  function handlePageSearch(event) {
-    const query = event.target.value.trim();
-    loadAvailablePages(query);
-  }
-
-  function handleCreatePage() {
-    window.open('https://www.notion.so', '_blank');
+    showToast('设置成功', `默认保存到「${target.title.length > 10 ? target.title.substring(0, 10) + '...' : target.title}」`, 'success', 2000);
   }
 
   // Clipping
   async function handleClip() {
-    if (!AppState.currentPageData || !AppState.currentPage || !AppState.accessToken) {
+    if (!AppState.currentPageData || !AppState.currentTarget || !AppState.accessToken) {
       showToast('剪藏失败', '缺少必要信息', 'error');
       return;
     }
@@ -470,12 +515,13 @@ document.addEventListener('DOMContentLoaded', function() {
         data: AppState.currentPageData,
         settings: {
           notionToken: AppState.accessToken,
-          pageId: AppState.currentPage.id
+          targetId: AppState.currentTarget.id,
+          targetType: AppState.currentTarget.type
         }
       });
 
       if (response.success) {
-        switchToSuccessView();
+        switchToSuccessView(response.pageUrl);
       } else {
         showToast('保存失败', response.error, 'error');
         updateClipButton();
@@ -487,12 +533,11 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Success handling
+  let lastClipPageUrl = null;
+
   function handleGotoNotion() {
-    if (AppState.currentPage?.url) {
-      window.open(AppState.currentPage.url, '_blank');
-    } else {
-      window.open('https://www.notion.so', '_blank');
-    }
+    const url = lastClipPageUrl || AppState.currentTarget?.url;
+    window.open(url || 'https://www.notion.so', '_blank');
   }
 
   function handleContinueClip() {
@@ -511,14 +556,15 @@ document.addEventListener('DOMContentLoaded', function() {
     switchPageState(elements.mainState);
   }
 
-  function switchToSuccessView() {
+  function switchToSuccessView(pageUrl) {
     AppState.currentView = 'success';
-    
+    lastClipPageUrl = pageUrl || null;
+
     // Update success page info
-    elements.successPageIcon.textContent = AppState.currentPage?.icon || '📄';
-    const pageTitle = AppState.currentPage?.title || '我的页面';
+    elements.successPageIcon.textContent = AppState.currentTarget?.type === 'database' ? '🗂️' : (AppState.currentTarget?.icon || '📄');
+    const pageTitle = AppState.currentTarget?.title || '我的页面';
     elements.successPageName.textContent = pageTitle.length > 15 ? pageTitle.substring(0, 15) + '...' : pageTitle;
-    
+
     switchPageState(elements.successState);
   }
 
@@ -608,18 +654,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Utility functions
-  function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout);
-        func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-    };
-  }
-
   function getRelativeTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();

@@ -711,9 +711,13 @@
       color: var(--color-text-primary);
     }
 
-    .drawer-search {
+    .drawer-notice {
       flex-shrink: 0;
-      padding: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--font-size-xs);
+      line-height: var(--line-height-relaxed);
+      color: var(--color-text-tertiary);
+      background: var(--color-background-secondary);
       border-bottom: 1px solid var(--color-border-light);
     }
 
@@ -792,10 +796,10 @@
       max-width: 100%;
     }
     
-    .page-item-title span:first-child {
-      flex-shrink: 0; /* 图标不收缩 */
+    .page-item-title span:not(:last-child) {
+      flex-shrink: 0; /* 展开箭头、图标不收缩 */
     }
-    
+
     .page-item-title span:last-child {
       overflow: hidden !important;
       white-space: nowrap !important;
@@ -804,6 +808,24 @@
       flex: 1 !important;
       max-width: 168px !important; /* 12个汉字 */
       display: inline-block !important;
+    }
+
+    .tree-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      color: var(--color-text-tertiary);
+      cursor: pointer;
+    }
+
+    .tree-toggle:hover {
+      color: var(--color-text-primary);
+    }
+
+    .tree-toggle-spacer {
+      display: inline-block;
+      width: 14px;
     }
 
     .page-item-meta {
@@ -1121,46 +1143,36 @@
           <button id="drawerBackBtn" class="btn-icon">
             <span>←</span>
           </button>
-          <h3 class="drawer-title">选择页面</h3>
+          <h3 class="drawer-title">选择保存位置</h3>
         </div>
       </div>
 
-      <!-- Search Section -->
-      <div class="drawer-search">
-        <input id="pageSearchInput" type="text" class="input" placeholder="🔍 搜索页面...">
+      <!-- Access Notice -->
+      <div class="drawer-notice">
+        此处仅显示已授权给 Red To Notion 的页面和数据库。想添加新的？可以退出后重新登录，在 Notion 授权弹窗里勾选新页面，或前往 Notion「设置 → 连接」找到 Red To Notion 手动追加。
       </div>
 
       <!-- Drawer Body -->
       <div class="drawer-body">
-
-        <!-- All Pages Section -->
         <div id="allPagesSection" class="drawer-section">
           <div class="section-header">
             <span class="section-icon">📁</span>
-            <span class="section-title">所有页面</span>
+            <span class="section-title">工作区结构</span>
           </div>
           <div id="allPagesList" class="page-list">
             <!-- Loading state -->
             <div id="pagesLoading" class="loading-state">
               <div class="loading"></div>
-              <span>正在加载页面...</span>
+              <span>正在加载工作区结构...</span>
             </div>
             <!-- Empty state -->
             <div id="pagesEmpty" class="empty-state hidden">
               <div class="empty-icon">📄</div>
-              <div class="empty-title">还没有页面呢</div>
-              <div class="empty-description">去 Notion 创建一个吧 ✨</div>
+              <div class="empty-title">没有找到已授权的页面或数据库</div>
+              <div class="empty-description">重新登录时勾选页面，或去 Notion「设置 → 连接」追加授权</div>
             </div>
-            <!-- Pages will be populated here -->
+            <!-- Tree items will be populated here -->
           </div>
-        </div>
-
-        <!-- Create Page Section -->
-        <div class="drawer-section">
-          <button id="createPageBtn" class="btn btn-ghost btn-full">
-            <span>+</span>
-            <span>创建新页面</span>
-          </button>
         </div>
       </div>
     </div>

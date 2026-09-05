@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Red To Notion",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "将小红书精彩内容一键保存到 Notion | Clip Xiaohongshu posts to Notion with one click",
   "short_name": "RedToNotion",
   "author": "Red To Notion Team",
@@ -20,6 +20,8 @@
   "optional_permissions": [],
   "host_permissions": [
     "https://www.xiaohongshu.com/*",
+    "https://*.xhscdn.com/*",
+    "https://ci.xiaohongshu.com/*",
     "https://api.notion.com/*",
     "https://*.vercel.app/*"
   ],
