@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Authentication
   async function checkAuthStatus() {
     try {
-      const result = await chrome.storage.sync.get([
+      const result = await chrome.storage.local.get([
         'oauthToken', 'workspaceName', 'workspaceIcon', 'authMethod',
         'defaultTarget',
         'defaultTargetId', 'defaultTargetType', 'defaultPageId' // 旧版本字段，用于迁移
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   async function handleLogout() {
-    await chrome.storage.sync.clear();
+    await chrome.storage.local.clear();
     AppState.isLoggedIn = false;
     AppState.accessToken = null;
     AppState.workspace = null;
@@ -482,7 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
   async function selectTarget(target) {
     AppState.currentTarget = target;
 
-    await chrome.storage.sync.set({
+    await chrome.storage.local.set({
       defaultTarget: {
         id: target.id,
         type: target.type,

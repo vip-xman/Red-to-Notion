@@ -362,21 +362,20 @@ async function handleNotionOAuth() {
                   chrome.tabs.onUpdated.removeListener(updateListener);
                   chrome.tabs.onRemoved.removeListener(removeListener);
 
-                  // 添加短暂延迟确保页面完全加载和处理完成
-                  setTimeout(() => {
-                    console.log('🔍 开始处理授权码 - code:', code, 'state:', returnedState);
+                  // 立即处理：MV3 Service Worker 可能在 setTimeout 等待期间被系统回收，
+                  // 之前用 setTimeout 延迟处理会导致回调永远不执行，
+                  // 而回调页面自身的倒计时仍会照常关闭标签页，造成"页面显示成功但插件未登录"
+                  console.log('🔍 开始处理授权码 - code:', code, 'state:', returnedState);
 
-                    // 关闭标签页
-                    chrome.tabs.remove(tabId);
+                  // 关闭标签页
+                  chrome.tabs.remove(tabId);
 
-                    if (returnedState !== state) {
-                      console.warn('⚠️ State验证失败，但继续执行 - 发送:', state, '接收:', returnedState);
-                    }
+                  if (returnedState !== state) {
+                    console.warn('⚠️ State验证失败，但继续执行 - 发送:', state, '接收:', returnedState);
+                  }
 
-                    // 继续token交换流程
-                    handleTokenExchange(code, REDIRECT_URI).then(resolve).catch(reject);
-
-                  }, 1500); // 增加延迟确保授权流程完全完成
+                  // 继续token交换流程
+                  handleTokenExchange(code, REDIRECT_URI).then(resolve).catch(reject);
                 } else {
                   // 没有code参数，可能是中间重定向，继续监听
                   console.log('⏳ 未检测到授权码，继续监听...');
@@ -466,10 +465,10 @@ async function handleTokenExchange(code, redirectUri) {
       oauthToken: dataToSave.oauthToken.substring(0, 10) + '...' // 隐藏敏感信息
     });
 
-    await chrome.storage.sync.set(dataToSave);
+    await chrome.storage.local.set(dataToSave);
 
     // 验证数据是否保存成功
-    const savedData = await chrome.storage.sync.get(['oauthToken', 'workspaceName', 'authMethod']);
+    const savedData = await chrome.storage.local.get(['oauthToken', 'workspaceName', 'authMethod']);
     console.log('✅ 保存后验证数据:', {
       hasToken: !!savedData.oauthToken,
       workspaceName: savedData.workspaceName,

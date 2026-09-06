@@ -181,15 +181,25 @@ export default async function handler(req, res) {
               现在可以愉快地剪藏小红书内容了！
             </div>
             
-            <p class="instruction">
-              📱 这个页面的使命已经完成，<span class="countdown">3</span>秒后华丽退场<br>
+            <p class="instruction" id="instructionText">
+              📱 插件正在完成登录，这个标签页即将自动关闭<br>
               🔙 请回到浏览器插件继续你的剪藏之旅吧！
             </p>
           </div>
 
           <script>
             console.log('OAuth callback page loaded with code: ${code}');
-            
+
+            // 兜底：正常情况下标签页由插件（background.js）在完成token交换后关闭，
+            // 这里仅作超时保护——如果插件因异常一直没关闭这个标签页，
+            // 10秒后提示用户手动检查，避免页面无限期卡在"登录中"状态
+            setTimeout(() => {
+              const el = document.getElementById('instructionText');
+              if (el) {
+                el.innerHTML = '⚠️ 如果插件弹窗仍显示未登录，请关闭此页面后重试一次<br>🔙 也可以手动关闭这个标签页';
+              }
+            }, 10000);
+
             // 生成彩带动画
             function createConfetti() {
               const colors = ['#ff6b35', '#f7931e', '#667eea', '#764ba2', '#28a745'];
@@ -202,49 +212,20 @@ export default async function handler(req, res) {
                   confetti.style.animationDelay = Math.random() * 3 + 's';
                   confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
                   document.body.appendChild(confetti);
-                  
+
                   setTimeout(() => {
                     confetti.remove();
                   }, 5000);
                 }, i * 200);
               }
             }
-            
-            // 倒计时功能
-            let countdown = 3;
-            const countdownEl = document.querySelector('.countdown');
-            
-            const countdownInterval = setInterval(() => {
-              countdown--;
-              if (countdownEl) {
-                countdownEl.textContent = countdown;
-              }
-              
-              if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                if (countdownEl) {
-                  countdownEl.parentElement.innerHTML = '👋 拜拜~ 页面正在关闭...';
-                }
-                
-                setTimeout(() => {
-                  console.log('Attempting to close window');
-                  if (window.close) {
-                    window.close();
-                  }
-                }, 500);
-              }
-            }, 1000);
-            
+
             // 启动彩带动画
             setTimeout(createConfetti, 1000);
-            
-            // 点击任意位置也可以关闭
-            document.addEventListener('click', () => {
-              clearInterval(countdownInterval);
-              if (window.close) {
-                window.close();
-              }
-            });
+
+            // 不在页面侧自动关闭标签页：关闭动作统一交给插件（background.js）在完成
+            // token 交换后执行，避免页面自行关闭时插件还没走完登录流程，
+            // 造成"页面显示成功、插件却仍是未登录状态"的假成功现象。
           </script>
         </body>
         </html>
