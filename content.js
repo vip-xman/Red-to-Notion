@@ -234,7 +234,18 @@ function extractContent() {
   return '';
 }
 
+// 视频帖没有图集，可视内容是视频本身；其详情页DOM里没有swiper轮播和常规图片容器，
+// 会导致extractImages()的兜底逻辑退化成全局搜索<img>，把评论区/直播通知栏等浮层里的
+// 表情图标当成正文配图抓取进来，因此视频帖直接跳过图片提取
+function isVideoNote() {
+  return !!document.querySelector('.note-detail video, .note-content video, video');
+}
+
 function extractImages() {
+  if (isVideoNote()) {
+    return [];
+  }
+
   const images = [];
 
   // 小红书轮播用Swiper实现，loop模式下DOM里会克隆首尾slide用于无缝循环，
